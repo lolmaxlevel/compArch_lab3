@@ -1,0 +1,39 @@
+[
+    {
+        "index": 0,
+        "opcode": "add",
+        "args": [
+            "r1",
+            "r2",
+            "r3"
+        ],
+        "term": [
+            1,
+            null,
+            "add"
+        ]
+    },
+    {
+        "index": 1,
+        "opcode": "jmp",
+        "args": [
+            "absolute",
+            0
+        ],
+        "term": [
+            2,
+            "aboba",
+            "jmp"
+        ]
+    },
+    {
+        "index": 2,
+        "opcode": "halt",
+        "args": [],
+        "term": [
+            3,
+            null,
+            "halt"
+        ]
+    }
+]
