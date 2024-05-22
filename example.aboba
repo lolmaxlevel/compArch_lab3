@@ -1,0 +1,6 @@
+aboba:
+    add r1 r2 r3
+
+jmp aboba
+
+halt 123
