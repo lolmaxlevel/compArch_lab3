@@ -24,26 +24,45 @@ def translate(source, labels):
         if opcode in (Opcode.JMP, Opcode.JZ, Opcode.JNZ):
             if args[0] in labels:
                 opcodes.append(
-                    {"index": len(opcodes), "opcode": opcode, "args": JumpArgs(AddressMode.ABS, labels[args[0]]),
-                     "term": Term(i, args[0], str(opcode))})
+                    {
+                        "index": len(opcodes),
+                        "opcode": opcode,
+                        "args": JumpArgs(AddressMode.ABS, labels[args[0]]),
+                        "term": Term(i, args[0], str(opcode)),
+                    }
+                )
         elif opcode in (Opcode.ADD, Opcode.SUB, Opcode.MOD):
-            opcodes.append({"index": len(opcodes), "opcode": opcode, "args": ArithmeticArgs(*args),
-                            "term": Term(i, None, str(opcode))})
+            opcodes.append(
+                {
+                    "index": len(opcodes),
+                    "opcode": opcode,
+                    "args": ArithmeticArgs(*args),
+                    "term": Term(i, None, str(opcode)),
+                }
+            )
         elif opcode in (Opcode.IN, Opcode.OUT):
-            opcodes.append({"index": len(opcodes), "opcode": opcode, "args": InOutArgs(args[0]),
-                            "term": Term(i, None, str(opcode))})
+            opcodes.append(
+                {
+                    "index": len(opcodes),
+                    "opcode": opcode,
+                    "args": InOutArgs(args[0]),
+                    "term": Term(i, None, str(opcode)),
+                }
+            )
         elif opcode in (Opcode.LOAD, Opcode.STORE, Opcode.MOVE):
-            opcodes.append({"index": len(opcodes), "opcode": opcode, "args": MoveArgs(*args),
-                            "term": Term(i, None, str(opcode))})
+            opcodes.append(
+                {"index": len(opcodes), "opcode": opcode, "args": MoveArgs(*args), "term": Term(i, None, str(opcode))}
+            )
         elif opcode in Opcode.CMP:
-            opcodes.append({"index": len(opcodes), "opcode": opcode, "args": CmpArgs(*args),
-                            "term": Term(i, None, str(opcode))})
+            opcodes.append(
+                {"index": len(opcodes), "opcode": opcode, "args": CmpArgs(*args), "term": Term(i, None, str(opcode))}
+            )
         elif opcode in Opcode.INC:
-            opcodes.append({"index": len(opcodes), "opcode": opcode, "args": (args[0]),
-                            "term": Term(i, None, str(opcode))})
+            opcodes.append(
+                {"index": len(opcodes), "opcode": opcode, "args": (args[0]), "term": Term(i, None, str(opcode))}
+            )
         else:
-            opcodes.append({"index": len(opcodes), "opcode": opcode, "args": args,
-                            "term": Term(i, None, str(opcode))})
+            opcodes.append({"index": len(opcodes), "opcode": opcode, "args": args, "term": Term(i, None, str(opcode))})
     return opcodes
 
 

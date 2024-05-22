@@ -5,6 +5,7 @@ from collections import namedtuple
 
 class Opcode(str, enum.Enum):
     """Опкоды инструкций."""
+
     LOAD = "load", 2  # Загрузка значения из памяти в регистр
     STORE = "store", 2  # Сохранение значения из регистра в память
 
@@ -38,6 +39,7 @@ class Opcode(str, enum.Enum):
 
 class AddressMode(str, enum.Enum):
     """Режимы адресации"""
+
     ABS = "absolute"
     REL = "relative"
     DATA = "data"
@@ -49,37 +51,38 @@ class AddressMode(str, enum.Enum):
 
 class Term(namedtuple("Term", "line related_label opcode")):
     """
-        Представляет отладочную информацию
+    Представляет отладочную информацию
     """
 
 
 class JumpArgs(namedtuple("Args", "mode addr")):
     """
-        Представляет аргументы инструкции
+    Представляет аргументы инструкции
     """
 
 
 class ArithmeticArgs(namedtuple("Args", "to operand1 operand2")):
     """
-        Представляет аргументы арифметической инструкции
+    Представляет аргументы арифметической инструкции
     """
 
 
 class MoveArgs(namedtuple("Args", "from_ to")):
     """
-        Представляет аргументы инструкции перемещения
+    Представляет аргументы инструкции перемещения
     """
 
 
 class InOutArgs(namedtuple("Args", "port")):
     """
-        Представляет аргументы инструкции ввода/вывода
-    """
-class CmpArgs(namedtuple("Args", "operand1 operand2")):
-    """
-        Представляет аргументы инструкции сравнения
+    Представляет аргументы инструкции ввода/вывода
     """
 
+
+class CmpArgs(namedtuple("Args", "operand1 operand2")):
+    """
+    Представляет аргументы инструкции сравнения
+    """
 
 
 def write_code(filename, code):
