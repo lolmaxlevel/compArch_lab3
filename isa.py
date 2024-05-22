@@ -38,10 +38,10 @@ class Opcode(str, enum.Enum):
 
 class AddressMode(str, enum.Enum):
     """Режимы адресации"""
-    ABS = 'absolute'
-    REL = 'relative'
-    DATA = 'data'
-    REG = 'register'
+    ABS = "absolute"
+    REL = "relative"
+    DATA = "data"
+    REG = "register"
 
     def __str__(self):
         return self.value
