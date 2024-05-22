@@ -3,4 +3,4 @@ aboba:
 
 jmp aboba
 
-halt 123
+halt
