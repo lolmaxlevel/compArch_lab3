@@ -102,7 +102,9 @@ def read_code(filename):
 
         # Конвертация списка term в класс Term
         if "term" in instr:
-            assert len(instr["term"]) == 2
-            instr["term"] = Term(instr["term"][0], instr["term"][1])
+            assert len(instr["term"]) == 3
+            instr["term"] = Term(instr["term"][0], instr["term"][1], instr["term"][2])
+        if "args" in instr:
+            instr["args"] = tuple(instr["args"])
 
     return code

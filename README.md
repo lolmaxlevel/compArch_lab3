@@ -26,8 +26,8 @@
                | "mod" <register> <register> <register>
                | "load" <register> <address>
                | "store" <register> <address>
-               | "in" <register> <number>
-               | "out" <register> <number>
+               | "in" <register> <port number>
+               | "out" <register> <port number>
                | "inc" <register>
                | <label> ":"
                | <comment>
