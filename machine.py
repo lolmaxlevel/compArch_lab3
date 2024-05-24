@@ -98,6 +98,26 @@ class ControlUnit:
             return self.alu.mod(arg1, arg2)
         raise ValueError()
 
+    def execute_memory(self, opcode, arg1, arg2):
+        if opcode == Opcode.LOAD:
+            data = self.data_path.read(arg2)
+            self.data_path.registers.latch_register(arg1, data)
+        if opcode == Opcode.STORE:
+            data = self.data_path.registers.registers[arg1]
+            self.data_path.write(arg2, data)
+        raise ValueError()
+
+    def execute_jump(self, opcode, arg1):
+        if opcode == Opcode.JMP:
+            self.instruction_counter = arg1
+        if opcode == Opcode.JZ:
+            if self.alu.zero_flag:
+                self.instruction_counter = arg1
+        if opcode == Opcode.JNZ:
+            if not self.alu.zero_flag:
+                self.instruction_counter = arg1
+        raise ValueError()
+
     def decode_and_execute_instruction(self):
         opcode = Opcode(self.data_path.read(self.instruction_counter)["opcode"])
         args = self.data_path.read(self.instruction_counter)["args"]
@@ -109,7 +129,19 @@ class ControlUnit:
                     opcode, self.data_path.registers.registers[args[1]], self.data_path.registers.registers[args[2]]
                 ),
             )
+        elif opcode in (Opcode.LOAD, Opcode.STORE):
+            self.execute_memory(opcode, *args)
             print("ADD/SUB/MOD", print(self.data_path.registers.registers))
+        elif opcode in (Opcode.IN, Opcode.OUT):
+            pass
+        elif opcode in (Opcode.CMP):
+            pass
+        elif opcode in (Opcode.INC):
+            pass
+        elif opcode in (Opcode.JMP, Opcode.JZ, Opcode.JNZ):
+            self.execute_jump(opcode, *args)
+        elif opcode in (Opcode.MOVE):
+            pass
 
 
 def simulation(code, input_, data_memory_size, limit):
