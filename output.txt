@@ -3,9 +3,9 @@
         "index": 0,
         "opcode": "add",
         "args": [
-            "r1",
-            "r2",
-            "r3"
+            1,
+            2,
+            3
         ],
         "term": [
             1,

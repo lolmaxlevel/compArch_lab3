@@ -11,6 +11,14 @@ def clean_source(src):
     return "\n".join(line.split(";")[0].strip() for line in src.split("\n") if line.strip())
 
 
+def get_register(args):
+    """Преобразует аргументы вида "rN" в число N (для упрощения работы)."""
+    for k in range(len(args)):
+        if args[k].startswith("r"):
+            args[k] = int(args[k][1:])
+    return args
+
+
 def translate(source, labels):
     """Транслирует исходный код в машинный."""
     opcodes = []
@@ -20,6 +28,7 @@ def translate(source, labels):
             continue
         opcode = Opcode(opcode)
         args = line.split(" ")[1:]
+        args = get_register(args)
         assert opcode.terms_count == len(args), f"Invalid args for {opcode} at line {i}"
         if opcode in (Opcode.JMP, Opcode.JZ, Opcode.JNZ):
             if args[0] in labels:

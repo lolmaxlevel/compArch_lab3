@@ -6,13 +6,13 @@ from isa import Opcode, read_code
 
 class Registers:
     # 8 registers for user, 2 for alu, 1 for io
-    registers = [0] * 8
+    registers = None
     io = 0
     left_out: int = 0
     right_out: int = 0
 
     def __init__(self):
-        self.registers = [0] * 8
+        self.registers = [0, 0, 0, 0, 0, 0, 0, 0]
         self.pc = 0
         self.io = 0
         self.left_out = 0
@@ -89,11 +89,27 @@ class ControlUnit:
     def tick(self):
         self.ticks += 1
 
+    def execute_arithmetic(self, opcode, arg1, arg2):
+        if opcode == Opcode.ADD:
+            return self.alu.add(arg1, arg2)
+        if opcode == Opcode.SUB:
+            return self.alu.sub(arg1, arg2)
+        if opcode == Opcode.MOD:
+            return self.alu.mod(arg1, arg2)
+        raise ValueError()
+
     def decode_and_execute_instruction(self):
         opcode = Opcode(self.data_path.read(self.instruction_counter)["opcode"])
         args = self.data_path.read(self.instruction_counter)["args"]
         self.tick()
-        print("Instruction counter: ", self.instruction_counter, "Ticks: ", self.ticks, "", print(opcode), args)
+        if opcode in (Opcode.ADD, Opcode.SUB, Opcode.MOD):
+            self.data_path.registers.latch_register(
+                args[0],
+                self.execute_arithmetic(
+                    opcode, self.data_path.registers.registers[args[1]], self.data_path.registers.registers[args[2]]
+                ),
+            )
+            print("ADD/SUB/MOD", print(self.data_path.registers.registers))
 
 
 def simulation(code, input_, data_memory_size, limit):
