@@ -3,7 +3,7 @@
         "index": 0,
         "opcode": "inc",
         "args": [
-            6
+            7
         ],
         "term": [
             0,
@@ -15,7 +15,7 @@
         "index": 1,
         "opcode": "load",
         "args": [
-            11,
+            12,
             0,
             "data"
         ],
@@ -27,7 +27,7 @@
     },
     {
         "index": 2,
-        "opcode": "move",
+        "opcode": "load",
         "args": [
             2,
             0,
@@ -36,7 +36,7 @@
         "term": [
             2,
             null,
-            "move"
+            "load"
         ]
     },
     {
@@ -57,16 +57,28 @@
         "index": 4,
         "opcode": "inc",
         "args": [
-            1
+            7
         ],
         "term": [
-            5,
+            4,
             null,
             "inc"
         ]
     },
     {
         "index": 5,
+        "opcode": "inc",
+        "args": [
+            1
+        ],
+        "term": [
+            6,
+            null,
+            "inc"
+        ]
+    },
+    {
+        "index": 6,
         "opcode": "add",
         "args": [
             3,
@@ -74,13 +86,13 @@
             0
         ],
         "term": [
-            6,
+            7,
             null,
             "add"
         ]
     },
     {
-        "index": 6,
+        "index": 7,
         "opcode": "load",
         "args": [
             4,
@@ -88,61 +100,61 @@
             "register"
         ],
         "term": [
-            7,
+            8,
             null,
             "load"
         ]
     },
     {
-        "index": 7,
+        "index": 8,
         "opcode": "out",
         "args": [
             4
         ],
         "term": [
-            8,
+            9,
             null,
             "out"
         ]
     },
     {
-        "index": 8,
+        "index": 9,
         "opcode": "cmp",
         "args": [
             1,
             2
         ],
         "term": [
-            9,
+            10,
             null,
             "cmp"
         ]
     },
     {
-        "index": 9,
+        "index": 10,
         "opcode": "jnz",
         "args": [
             "absolute",
-            4
+            5
         ],
         "term": [
-            10,
+            11,
             "loop",
             "jnz"
         ]
     },
     {
-        "index": 10,
+        "index": 11,
         "opcode": "halt",
         "args": [],
         "term": [
-            12,
+            13,
             null,
             "halt"
         ]
     },
     {
-        "index": 11,
+        "index": 12,
         "opcode": "data",
         "args": [
             "hello world",

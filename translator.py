@@ -121,9 +121,6 @@ def translate(source, labels, data):
         if opcode["opcode"] in (Opcode.LOAD, Opcode.STORE):
             if type(opcode["args"][1]) != int and opcode["args"][1].startswith("$"):
                 opcode["args"] = MoveArgs(data_labels[opcode["args"][1][1:]], opcode["args"][0], AddressMode.DATA)
-        if opcode["opcode"] in (Opcode.MOVE):
-            if type(opcode["args"][1]) != int and opcode["args"][1].startswith("("):
-                opcode["args"] = MoveArgs(opcode["args"][0], data_labels[opcode["args"][1][1:-1]], AddressMode.DIRECT)
     return opcodes
 
 

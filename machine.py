@@ -111,8 +111,10 @@ class ControlUnit:
         if opcode == Opcode.LOAD:
             if arg3 == AddressMode.DIRECT:
                 self.data_path.registers.latch_register(arg1, arg2)
+
             elif arg3 == AddressMode.DATA:
                 self.data_path.registers.latch_register(arg2, arg1)
+
             elif arg3 == AddressMode.REG:
                 pos = self.data_path.registers.registers[arg2]
                 self.data_path.registers.latch_register(arg1, self.data_path.read(pos)["args"])
