@@ -12,7 +12,7 @@ class Registers:
     right_out: int = 0
 
     def __init__(self):
-        self.registers = [0, 0, 0, 0, 0, 0, 0, 0]
+        self.registers = [0, 104, 0, 0, 0, 0, 0, 0]
         self.pc = 0
         self.io = 0
         self.left_out = 0
@@ -60,13 +60,15 @@ class Alu:
 
 
 class DataPath:
-    def __init__(self, memory, memory_size):
+    def __init__(self, memory, memory_size, input_):
         assert memory_size > 0
         self.memory = [0] * memory_size
         self.registers = [0] * 8
         for i in range(len(memory)):
             self.memory[i] = memory[i]
         self.registers = Registers()
+        self.input_ = input_
+        self.output_buffer = []
 
     def read(self, address):
         return self.memory[address]
@@ -74,8 +76,15 @@ class DataPath:
     def write(self, address, value):
         self.memory[address] = {"data": value}
 
-    def output(self, port):
-        return self.registers.io
+    def signal_input(self, port):
+        try:
+            self.registers.io = ord(self.input_.pop(0))
+        except IndexError:
+            sys.exit(-12)
+
+    def signal_output(self, port):
+        symbol = chr(self.registers.io)
+        self.output_buffer.append(symbol)
 
 
 class ControlUnit:
@@ -96,7 +105,7 @@ class ControlUnit:
             return self.alu.sub(arg1, arg2)
         if opcode == Opcode.MOD:
             return self.alu.mod(arg1, arg2)
-        raise ValueError()
+        return 0
 
     def execute_memory(self, opcode, arg1, arg2):
         if opcode == Opcode.LOAD:
@@ -105,7 +114,6 @@ class ControlUnit:
         if opcode == Opcode.STORE:
             data = self.data_path.registers.registers[arg1]
             self.data_path.write(arg2, data)
-        raise ValueError()
 
     def execute_jump(self, opcode, arg1):
         if opcode == Opcode.JMP:
@@ -116,7 +124,25 @@ class ControlUnit:
         if opcode == Opcode.JNZ:
             if not self.alu.zero_flag:
                 self.instruction_counter = arg1
-        raise ValueError()
+
+    def execute_in_out(self, opcode, arg1):
+        if opcode == Opcode.IN:
+            self.data_path.signal_input(arg1)
+        if opcode == Opcode.OUT:
+            self.data_path.signal_output(arg1)
+
+    def execute_inc(self, opcode, arg1):
+        if opcode == Opcode.INC:
+            data = self.data_path.registers.registers[arg1]
+            self.data_path.registers.latch_register(arg1, self.alu.inc(data))
+
+    def execute_cmp(self, opcode, arg1, arg2):
+        if opcode == Opcode.CMP:
+            self.alu.cmp(arg1, arg2)
+
+    def execute_move(self, opcode, arg1, arg2):
+        if opcode == Opcode.MOVE:
+            self.data_path.registers.latch_register(arg1, self.data_path.registers.registers[arg2])
 
     def decode_and_execute_instruction(self):
         opcode = Opcode(self.data_path.read(self.instruction_counter)["opcode"])
@@ -129,27 +155,33 @@ class ControlUnit:
                     opcode, self.data_path.registers.registers[args[1]], self.data_path.registers.registers[args[2]]
                 ),
             )
+
         elif opcode in (Opcode.LOAD, Opcode.STORE):
             self.execute_memory(opcode, *args)
-            print("ADD/SUB/MOD", print(self.data_path.registers.registers))
         elif opcode in (Opcode.IN, Opcode.OUT):
-            pass
+            self.execute_in_out(opcode, *args)
         elif opcode in (Opcode.CMP):
-            pass
+            self.execute_cmp(opcode, *args)
         elif opcode in (Opcode.INC):
-            pass
+            self.execute_inc(opcode, *args)
         elif opcode in (Opcode.JMP, Opcode.JZ, Opcode.JNZ):
             self.execute_jump(opcode, *args)
         elif opcode in (Opcode.MOVE):
-            pass
+            self.execute_move(opcode, *args)
+        elif opcode in (Opcode.HALT):
+            raise StopIteration
 
 
 def simulation(code, input_, data_memory_size, limit):
-    data_path = DataPath(code, data_memory_size)
+    data_path = DataPath(code, data_memory_size, input_)
     control_unit = ControlUnit(data_path)
     while control_unit.instruction_counter < len(code) and control_unit.ticks < limit:
-        control_unit.decode_and_execute_instruction()
-    return [], 0, 0
+        try:
+            control_unit.decode_and_execute_instruction()
+        except StopIteration:
+            break
+        control_unit.instruction_counter += 1
+    return data_path.output_buffer, control_unit.instruction_counter, control_unit.ticks
 
 
 def main(code_file, input_file):
@@ -159,12 +191,12 @@ def main(code_file, input_file):
         input_token = []
         for char in input_text:
             input_token.append(char)
-
+        input_token = ["H"]
         output, instr_counter, ticks = simulation(
             code,
             input_token,
             100,
-            1,
+            5,
         )
 
         print("".join(output))

@@ -1,6 +1,4 @@
-aboba:
-    add r1 r2 r3
-
-jmp aboba
+in 0
+out 0
 
 halt
