@@ -7,8 +7,13 @@ from isa import AddressMode, ArithmeticArgs, CmpArgs, InOutArgs, JumpArgs, MoveA
 
 
 def clean_source(src):
-    """Удаляет комментарии и пустые строки."""
+    """Удаляет комментарии, пустые строки, секцию .data"""
     return "\n".join(line.split(";")[0].strip() for line in src.split("\n") if line.strip())
+
+
+def remove_data(src):
+    """Удаляет секцию .data"""
+    return src[:src.index(".data")]
 
 
 def get_register(args):
@@ -19,12 +24,22 @@ def get_register(args):
     return args
 
 
+def parse_data(src):
+    data = []
+    lines = src.split("\n")
+    lines = lines[lines.index(".data") + 1:lines.index(".code")]
+    for i, line in enumerate(lines):
+        words = line.split('"')
+        data.append({"index": i, "label": words[0].strip(), "value": words[1], "length": int(words[2])})
+    return data
+
+
 def translate(source, labels):
     """Транслирует исходный код в машинный."""
     opcodes = []
     for i, line in enumerate(source.split("\n")):
         opcode = line.split(" ", 1)[0]
-        if opcode.endswith(":"):
+        if opcode.endswith(":") or opcode.startswith(".") or not opcode:
             continue
         opcode = Opcode(opcode)
         args = line.split(" ")[1:]
@@ -96,8 +111,10 @@ def main(source, target):
         source = f.read()
     cleaned_source = clean_source(source)
     labels = parse_labels(cleaned_source)
-    code = translate(cleaned_source, labels)
-    print(code)
+    source_without_data = remove_data(cleaned_source)
+    data = parse_data(cleaned_source)
+    print(data)
+    code = translate(source_without_data, labels)
     isa.write_code(target, code)
 
     print("source LoC:", len(source.split("\n")), "code instr:", len(code))

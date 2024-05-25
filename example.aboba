@@ -1,5 +1,5 @@
-in r0
-out r0
-move r2 #72
-out r2
-halt
+.data
+    hello "hello world" 11
+    aboba "aboba" 5
+.code
+2
