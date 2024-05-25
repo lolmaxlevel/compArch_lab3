@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from isa import Opcode, read_code, AddressMode
+from isa import AddressMode, Opcode, read_code
 
 
 class Registers:
@@ -206,8 +206,11 @@ def main(code_file, input_file):
             data_ = code[i]
             new_code.append({"index": data_["index"], "opcode": Opcode.DATA, "args": (data_["args"][1])})
             new_code.extend(
-                [{"index": data_["index"] + j + 1, "opcode": Opcode.DATA, "args": (ord(data_["args"][0][j]))} for j in
-                 range(len(data_["args"][0]))])
+                [
+                    {"index": data_["index"] + j + 1, "opcode": Opcode.DATA, "args": (ord(data_["args"][0][j]))}
+                    for j in range(len(data_["args"][0]))
+                ]
+            )
         else:
             new_code.append(code[i])
 

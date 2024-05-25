@@ -13,7 +13,7 @@ def clean_source(src):
 
 def remove_data(src):
     """Удаляет секцию .data"""
-    return src[src.index(".code") + 6:]
+    return src[src.index(".code") + 6 :]
 
 
 def get_register(args):
@@ -25,14 +25,103 @@ def get_register(args):
 
 
 def parse_data(src):
-    """ Получает данные из секции .data """
+    """Получает данные из секции .data"""
     data = []
     lines = src.split("\n")
-    lines = lines[lines.index(".data") + 1:lines.index(".code")]
+    lines = lines[lines.index(".data") + 1 : lines.index(".code")]
     for i, line in enumerate(lines):
         words = line.split('"')
         data.append({"index": i, "label": words[0].strip(), "value": words[1], "length": int(words[2])})
     return data
+
+
+def handle_jump(opcode, args, labels, opcodes, i):
+    if args[0] in labels:
+        opcodes.append(
+            {
+                "index": len(opcodes),
+                "opcode": opcode,
+                "args": JumpArgs(AddressMode.ABS, labels[args[0]]),
+                "term": Term(i, args[0], str(opcode)),
+            }
+        )
+
+
+def handle_arithmetic(opcode, args, opcodes, i):
+    opcodes.append(
+        {
+            "index": len(opcodes),
+            "opcode": opcode,
+            "args": ArithmeticArgs(*args),
+            "term": Term(i, None, str(opcode)),
+        }
+    )
+
+
+def handle_io(opcode, args, opcodes, i):
+    opcodes.append(
+        {
+            "index": len(opcodes),
+            "opcode": opcode,
+            "args": InOutArgs(args[0]),
+            "term": Term(i, None, str(opcode)),
+        }
+    )
+
+
+def handle_move(opcode, args, opcodes, i):
+    try:
+        is_direct = args[1].startswith("#")
+        if is_direct:
+            args[1] = int(args[1][1:])
+        opcodes.append(
+            {
+                "index": len(opcodes),
+                "opcode": opcode,
+                "args": MoveArgs(args[0], args[1], AddressMode.DIRECT),
+                "term": Term(i, None, str(opcode)),
+            }
+        )
+    except AttributeError:
+        opcodes.append(
+            {
+                "index": len(opcodes),
+                "opcode": opcode,
+                "args": MoveArgs(args[0], args[1], AddressMode.REG),
+                "term": Term(i, None, str(opcode)),
+            }
+        )
+
+
+def handle_memory(opcode, args, opcodes, i):
+    if not isinstance(args[1], int) and args[1].startswith("$"):
+        opcodes.append(
+            {
+                "index": len(opcodes),
+                "opcode": opcode,
+                "args": MoveArgs(args[0], args[1], AddressMode.DATA),
+                "term": Term(i, None, str(opcode)),
+            }
+        )
+    else:
+        opcodes.append(
+            {
+                "index": len(opcodes),
+                "opcode": opcode,
+                "args": MoveArgs(args[0], args[1], AddressMode.REG),
+                "term": Term(i, None, str(opcode)),
+            }
+        )
+
+
+def handle_cmp(opcode, args, opcodes, i):
+    opcodes.append(
+        {"index": len(opcodes), "opcode": opcode, "args": CmpArgs(*args), "term": Term(i, None, str(opcode))}
+    )
+
+
+def handle_inc(opcode, args, opcodes, i):
+    opcodes.append({"index": len(opcodes), "opcode": opcode, "args": [args[0]], "term": Term(i, None, str(opcode))})
 
 
 def translate(source, labels, data):
@@ -47,81 +136,42 @@ def translate(source, labels, data):
         args = get_register(args)
         assert opcode.terms_count == len(args), f"Invalid args for {opcode} at line {i}"
         if opcode in (Opcode.JMP, Opcode.JZ, Opcode.JNZ):
-            if args[0] in labels:
-                opcodes.append(
-                    {
-                        "index": len(opcodes),
-                        "opcode": opcode,
-                        "args": JumpArgs(AddressMode.ABS, labels[args[0]]),
-                        "term": Term(i, args[0], str(opcode)),
-                    }
-                )
+            handle_jump(opcode, args, labels, opcodes, i)
         elif opcode in (Opcode.ADD, Opcode.SUB, Opcode.MOD):
-            opcodes.append(
-                {
-                    "index": len(opcodes),
-                    "opcode": opcode,
-                    "args": ArithmeticArgs(*args),
-                    "term": Term(i, None, str(opcode)),
-                }
-            )
+            handle_arithmetic(opcode, args, opcodes, i)
         elif opcode in (Opcode.IN, Opcode.OUT):
-            opcodes.append(
-                {
-                    "index": len(opcodes),
-                    "opcode": opcode,
-                    "args": InOutArgs(args[0]),
-                    "term": Term(i, None, str(opcode)),
-                }
-            )
+            handle_io(opcode, args, opcodes, i)
         elif opcode in (Opcode.MOVE):
-            try:
-                is_direct = args[1].startswith("#")
-                if is_direct:
-                    args[1] = int(args[1][1:])
-                opcodes.append(
-                    {"index": len(opcodes), "opcode": opcode, "args": MoveArgs(args[0], args[1], AddressMode.DIRECT),
-                     "term": Term(i, None, str(opcode))}
-                )
-            except AttributeError:
-                opcodes.append(
-                    {"index": len(opcodes), "opcode": opcode, "args": MoveArgs(args[0], args[1], AddressMode.REG),
-                     "term": Term(i, None, str(opcode))}
-                )
+            handle_move(opcode, args, opcodes, i)
         elif opcode in (Opcode.LOAD, Opcode.STORE):
-            if type(args[1]) != int and args[1].startswith("$"):
-                opcodes.append(
-                    {"index": len(opcodes), "opcode": opcode, "args": MoveArgs(args[0], args[1], AddressMode.DATA),
-                     "term": Term(i, None, str(opcode))}
-                )
-            else:
-                opcodes.append(
-                    {"index": len(opcodes), "opcode": opcode, "args": MoveArgs(args[0], args[1], AddressMode.REG),
-                     "term": Term(i, None, str(opcode))}
-                )
+            handle_memory(opcode, args, opcodes, i)
         elif opcode in Opcode.CMP:
-            opcodes.append(
-                {"index": len(opcodes), "opcode": opcode, "args": CmpArgs(*args), "term": Term(i, None, str(opcode))}
-            )
+            handle_cmp(opcode, args, opcodes, i)
         elif opcode in Opcode.INC:
-            opcodes.append(
-                {"index": len(opcodes), "opcode": opcode, "args": [args[0]], "term": Term(i, None, str(opcode))}
-            )
+            handle_inc(opcode, args, opcodes, i)
         else:
             opcodes.append({"index": len(opcodes), "opcode": opcode, "args": args, "term": Term(i, None, str(opcode))})
+    add_data(opcodes, data)
+    return opcodes
 
-    opcodes.extend([{
-        "index": len(opcodes) + sum(k["length"] for k in data[0:i]) + i,
-        "opcode": "data",
-        "args": [data[i]["value"], data[i]["length"]],
-        "term": Term(i, data[i]["label"], "data")
-    } for i in range(len(data))])
+
+def add_data(opcodes, data):
+    opcodes.extend(
+        [
+            {
+                "index": len(opcodes) + sum(k["length"] for k in data[0:i]) + i,
+                "opcode": "data",
+                "args": [data[i]["value"], data[i]["length"]],
+                "term": Term(i, data[i]["label"], "data"),
+            }
+            for i in range(len(data))
+        ]
+    )
     data_labels = {data[i]["label"]: len(opcodes) - len(data) + i for i in range(len(data))}
     for opcode in opcodes:
         if opcode["opcode"] in (Opcode.LOAD, Opcode.STORE):
-            if type(opcode["args"][1]) != int and opcode["args"][1].startswith("$"):
+            if not isinstance(opcode["args"][1], int) and opcode["args"][1].startswith("$"):
                 opcode["args"] = MoveArgs(data_labels[opcode["args"][1][1:]], opcode["args"][0], AddressMode.DATA)
-    return opcodes
 
 
 def parse_labels(source):
