@@ -11,9 +11,8 @@
 ```ebnf
 <program> ::= { <section> }
 
-<section> ::= "section" "." "text" ":" { <instruction> }
-            | "section" "." "data" ":" { <data_definition> }
-            | "int" <number> ":" { <interrupt_instruction> }
+<section> ::= "section" "." "data" ":" { <data_definition> }
+            | "section" "." "code" ":" { <instruction> }
 
 <instruction> ::= "jmp" <label>
                | "jz" <label>
@@ -32,7 +31,7 @@
                | <label> ":"
                | <comment>
 
-<data_definition> ::= <identifier> ":" <data_value>
+<data_definition> ::= <identifier> <data_value>
                     | <comment>
 
 <data_value> ::= <string>

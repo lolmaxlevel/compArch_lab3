@@ -111,10 +111,8 @@ class ControlUnit:
         if opcode == Opcode.LOAD:
             if arg3 == AddressMode.DIRECT:
                 self.data_path.registers.latch_register(arg1, arg2)
-
             elif arg3 == AddressMode.DATA:
                 self.data_path.registers.latch_register(arg2, arg1)
-
             elif arg3 == AddressMode.REG:
                 pos = self.data_path.registers.registers[arg2]
                 self.data_path.registers.latch_register(arg1, self.data_path.read(pos)["args"])
@@ -135,8 +133,10 @@ class ControlUnit:
     def execute_in_out(self, opcode, arg1):
         if opcode == Opcode.IN:
             self.data_path.signal_input(arg1)
+            self.tick()
         if opcode == Opcode.OUT:
             self.data_path.signal_output(arg1)
+            self.tick()
 
     def execute_inc(self, opcode, arg1):
         if opcode == Opcode.INC:
@@ -223,7 +223,7 @@ def main(code_file, input_file):
             new_code,
             input_token,
             100,
-            100,
+            10000,
         )
         print(output)
         print("".join(output))

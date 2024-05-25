@@ -13,7 +13,7 @@ def clean_source(src):
 
 def remove_data(src):
     """Удаляет секцию .data"""
-    return src[src.index(".code") + 6 :]
+    return src[src.index(".code") + 6:]
 
 
 def get_register(args):
@@ -28,7 +28,7 @@ def parse_data(src):
     """Получает данные из секции .data"""
     data = []
     lines = src.split("\n")
-    lines = lines[lines.index(".data") + 1 : lines.index(".code")]
+    lines = lines[lines.index(".data") + 1: lines.index(".code")]
     for i, line in enumerate(lines):
         words = line.split('"')
         data.append({"index": i, "label": words[0].strip(), "value": words[1], "length": int(words[2])})
@@ -176,11 +176,12 @@ def add_data(opcodes, data):
 
 def parse_labels(source):
     labels = {}
+    counter = 0
     for i, line in enumerate(source.split("\n")):
         line = line.split(";", 1)[0].strip()
-        if not line:
-            continue
         if line.endswith(":"):
+            i -= counter
+            counter += 1
             label = line[:-1]
             labels[label] = i
     return labels
@@ -192,6 +193,7 @@ def main(source, target):
     cleaned_source = clean_source(source)
     source_without_data = remove_data(cleaned_source)
     labels = parse_labels(source_without_data)
+    print(labels)
     data = parse_data(cleaned_source)
     code = translate(source_without_data, labels, data)
     isa.write_code(target, code)
