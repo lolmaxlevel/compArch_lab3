@@ -3,7 +3,7 @@
         "index": 0,
         "opcode": "in",
         "args": [
-            "0"
+            0
         ],
         "term": [
             0,
@@ -15,7 +15,7 @@
         "index": 1,
         "opcode": "out",
         "args": [
-            "0"
+            0
         ],
         "term": [
             1,
@@ -25,10 +25,36 @@
     },
     {
         "index": 2,
+        "opcode": "move",
+        "args": [
+            2,
+            72,
+            true
+        ],
+        "term": [
+            2,
+            null,
+            "move"
+        ]
+    },
+    {
+        "index": 3,
+        "opcode": "out",
+        "args": [
+            2
+        ],
+        "term": [
+            3,
+            null,
+            "out"
+        ]
+    },
+    {
+        "index": 4,
         "opcode": "halt",
         "args": [],
         "term": [
-            2,
+            4,
             null,
             "halt"
         ]

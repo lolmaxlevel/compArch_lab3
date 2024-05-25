@@ -76,14 +76,14 @@ class DataPath:
     def write(self, address, value):
         self.memory[address] = {"data": value}
 
-    def signal_input(self, port):
+    def signal_input(self, reg, port=0):
         try:
-            self.registers.io = ord(self.input_.pop(0))
+            self.registers.latch_register(reg, ord(self.input_.pop(0)))
         except IndexError:
             sys.exit(-12)
 
-    def signal_output(self, port):
-        symbol = chr(self.registers.io)
+    def signal_output(self, reg, port=0):
+        symbol = chr(self.registers.registers[reg])
         self.output_buffer.append(symbol)
 
 
@@ -140,9 +140,12 @@ class ControlUnit:
         if opcode == Opcode.CMP:
             self.alu.cmp(arg1, arg2)
 
-    def execute_move(self, opcode, arg1, arg2):
+    def execute_move(self, opcode, arg1, arg2, arg3):
         if opcode == Opcode.MOVE:
-            self.data_path.registers.latch_register(arg1, self.data_path.registers.registers[arg2])
+            if arg3:
+                self.data_path.registers.latch_register(arg1, arg2)
+            else:
+                self.data_path.registers.latch_register(arg1, self.data_path.registers.registers[arg2])
 
     def decode_and_execute_instruction(self):
         opcode = Opcode(self.data_path.read(self.instruction_counter)["opcode"])
@@ -178,6 +181,7 @@ def simulation(code, input_, data_memory_size, limit):
     while control_unit.instruction_counter < len(code) and control_unit.ticks < limit:
         try:
             control_unit.decode_and_execute_instruction()
+            print(control_unit.instruction_counter, control_unit.ticks, data_path.registers.registers)
         except StopIteration:
             break
         control_unit.instruction_counter += 1
@@ -191,12 +195,11 @@ def main(code_file, input_file):
         input_token = []
         for char in input_text:
             input_token.append(char)
-        input_token = ["H"]
         output, instr_counter, ticks = simulation(
             code,
             input_token,
             100,
-            5,
+            50,
         )
 
         print("".join(output))

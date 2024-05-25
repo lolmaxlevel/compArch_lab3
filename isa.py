@@ -67,7 +67,7 @@ class ArithmeticArgs(namedtuple("Args", "to operand1 operand2")):
     """
 
 
-class MoveArgs(namedtuple("Args", "from_ to")):
+class MoveArgs(namedtuple("Args", "from_ to direct")):
     """
     Представляет аргументы инструкции перемещения
     """

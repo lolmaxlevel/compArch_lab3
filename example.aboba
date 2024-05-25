@@ -1,4 +1,5 @@
-in 0
-out 0
-
+in r0
+out r0
+move r2 #72
+out r2
 halt

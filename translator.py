@@ -59,8 +59,12 @@ def translate(source, labels):
                 }
             )
         elif opcode in (Opcode.LOAD, Opcode.STORE, Opcode.MOVE):
+            is_direct = args[1].startswith("#")
+            if is_direct:
+                args[1] = int(args[1][1:])
             opcodes.append(
-                {"index": len(opcodes), "opcode": opcode, "args": MoveArgs(*args), "term": Term(i, None, str(opcode))}
+                {"index": len(opcodes), "opcode": opcode, "args": MoveArgs(args[0], args[1], is_direct),
+                 "term": Term(i, None, str(opcode))}
             )
         elif opcode in Opcode.CMP:
             opcodes.append(
