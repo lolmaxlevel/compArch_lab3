@@ -1,7 +1,7 @@
 # Risc Machine. Экспериментальная модель процессора и транслятора
 
 - Терновский Илья Евгеньевич, P3232
-- alg -> asm | risc | neum | hw | tick -> instr | struct | stream | port | pstr | prob1 | pipeline
+- alg -> asm | risc | neum | hw | tick -> instr | struct | stream | port |  | prob1 | pipeline
 - Упрощенный вариант (asm | risc | neum | hw | instr | struct | stream | port | pstr | prob1)
 
 ## Язык программирования

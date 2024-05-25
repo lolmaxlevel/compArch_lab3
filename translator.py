@@ -13,7 +13,7 @@ def clean_source(src):
 
 def remove_data(src):
     """Удаляет секцию .data"""
-    return src[:src.index(".data")]
+    return src[src.index(".code") + 6:]
 
 
 def get_register(args):
@@ -25,6 +25,7 @@ def get_register(args):
 
 
 def parse_data(src):
+    """ Получает данные из секции .data """
     data = []
     lines = src.split("\n")
     lines = lines[lines.index(".data") + 1:lines.index(".code")]
@@ -34,7 +35,7 @@ def parse_data(src):
     return data
 
 
-def translate(source, labels):
+def translate(source, labels, data):
     """Транслирует исходный код в машинный."""
     opcodes = []
     for i, line in enumerate(source.split("\n")):
@@ -73,24 +74,56 @@ def translate(source, labels):
                     "term": Term(i, None, str(opcode)),
                 }
             )
-        elif opcode in (Opcode.LOAD, Opcode.STORE, Opcode.MOVE):
-            is_direct = args[1].startswith("#")
-            if is_direct:
-                args[1] = int(args[1][1:])
-            opcodes.append(
-                {"index": len(opcodes), "opcode": opcode, "args": MoveArgs(args[0], args[1], is_direct),
-                 "term": Term(i, None, str(opcode))}
-            )
+        elif opcode in (Opcode.MOVE):
+            try:
+                is_direct = args[1].startswith("#")
+                if is_direct:
+                    args[1] = int(args[1][1:])
+                opcodes.append(
+                    {"index": len(opcodes), "opcode": opcode, "args": MoveArgs(args[0], args[1], AddressMode.DIRECT),
+                     "term": Term(i, None, str(opcode))}
+                )
+            except AttributeError:
+                opcodes.append(
+                    {"index": len(opcodes), "opcode": opcode, "args": MoveArgs(args[0], args[1], AddressMode.REG),
+                     "term": Term(i, None, str(opcode))}
+                )
+        elif opcode in (Opcode.LOAD, Opcode.STORE):
+            if type(args[1]) != int and args[1].startswith("$"):
+                opcodes.append(
+                    {"index": len(opcodes), "opcode": opcode, "args": MoveArgs(args[0], args[1], AddressMode.DATA),
+                     "term": Term(i, None, str(opcode))}
+                )
+            else:
+                opcodes.append(
+                    {"index": len(opcodes), "opcode": opcode, "args": MoveArgs(args[0], args[1], AddressMode.REG),
+                     "term": Term(i, None, str(opcode))}
+                )
         elif opcode in Opcode.CMP:
             opcodes.append(
                 {"index": len(opcodes), "opcode": opcode, "args": CmpArgs(*args), "term": Term(i, None, str(opcode))}
             )
         elif opcode in Opcode.INC:
             opcodes.append(
-                {"index": len(opcodes), "opcode": opcode, "args": (args[0]), "term": Term(i, None, str(opcode))}
+                {"index": len(opcodes), "opcode": opcode, "args": [args[0]], "term": Term(i, None, str(opcode))}
             )
         else:
             opcodes.append({"index": len(opcodes), "opcode": opcode, "args": args, "term": Term(i, None, str(opcode))})
+
+    opcodes.extend([{
+        "index": len(opcodes) + sum(k["length"] for k in data[0:i]) + i,
+        "opcode": "data",
+        "args": [data[i]["value"], data[i]["length"]],
+        "term": Term(i, data[i]["label"], "data")
+    } for i in range(len(data))])
+    data_labels = {data[i]["label"]: len(opcodes) - len(data) + i for i in range(len(data))}
+    for opcode in opcodes:
+        if opcode["opcode"] in (Opcode.LOAD, Opcode.STORE):
+            if type(opcode["args"][1]) != int and opcode["args"][1].startswith("$"):
+                opcode["args"] = MoveArgs(data_labels[opcode["args"][1][1:]], opcode["args"][0], AddressMode.DATA)
+        if opcode["opcode"] in (Opcode.MOVE):
+            if type(opcode["args"][1]) != int and opcode["args"][1].startswith("("):
+                opcode["args"] = MoveArgs(opcode["args"][0], data_labels[opcode["args"][1][1:-1]], AddressMode.DIRECT)
     return opcodes
 
 
@@ -110,11 +143,10 @@ def main(source, target):
     with open(source) as f:
         source = f.read()
     cleaned_source = clean_source(source)
-    labels = parse_labels(cleaned_source)
     source_without_data = remove_data(cleaned_source)
+    labels = parse_labels(source_without_data)
     data = parse_data(cleaned_source)
-    print(data)
-    code = translate(source_without_data, labels)
+    code = translate(source_without_data, labels, data)
     isa.write_code(target, code)
 
     print("source LoC:", len(source.split("\n")), "code instr:", len(code))

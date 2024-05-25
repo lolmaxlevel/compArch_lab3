@@ -12,7 +12,7 @@ class Opcode(str, enum.Enum):
     ADD = "add", 3  # Сложение
     SUB = "sub", 3  # Вычитание
     MOD = "mod", 3  # Остаток от деления
-    INC = "inc", 3  # Увеличение на единицу
+    INC = "inc", 1  # Увеличение на единицу
 
     CMP = "cmp", 2  # Сравнение
 
@@ -26,6 +26,8 @@ class Opcode(str, enum.Enum):
     MOVE = "move", 2  # Перемещение данных между регистрами
 
     HALT = "halt", 0  # Остановка выполнения программы
+
+    DATA = "data", 2  # Данные
 
     def __new__(cls, value, terms_count):
         obj = str.__new__(cls, value)
@@ -44,6 +46,7 @@ class AddressMode(str, enum.Enum):
     REL = "relative"
     DATA = "data"
     REG = "register"
+    DIRECT = "direct"
 
     def __str__(self):
         return self.value
@@ -67,7 +70,7 @@ class ArithmeticArgs(namedtuple("Args", "to operand1 operand2")):
     """
 
 
-class MoveArgs(namedtuple("Args", "from_ to direct")):
+class MoveArgs(namedtuple("Args", "from_ to mode")):
     """
     Представляет аргументы инструкции перемещения
     """
@@ -105,6 +108,6 @@ def read_code(filename):
             assert len(instr["term"]) == 3
             instr["term"] = Term(instr["term"][0], instr["term"][1], instr["term"][2])
         if "args" in instr:
-            instr["args"] = tuple(instr["args"])
+            instr["args"] = list(instr["args"])
 
     return code

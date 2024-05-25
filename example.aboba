@@ -1,5 +1,17 @@
 .data
     hello "hello world" 11
-    aboba "aboba" 5
+
 .code
-2
+    inc r6
+    load r0 $hello ; load the address of the string into r0
+    move r2 r0   ; copy the address to r2, we will use this to loop through the string
+    move r1 #0  ; set r1 to 0, this will be our loop counter
+    loop:
+        inc r1
+        add r3 r1 r0
+        load r4 r3
+        out r4
+        cmp r1 r2
+        jnz loop
+    end:
+        halt

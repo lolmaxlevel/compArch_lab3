@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from isa import Opcode, read_code
+from isa import Opcode, read_code, AddressMode
 
 
 class Registers:
@@ -12,7 +12,7 @@ class Registers:
     right_out: int = 0
 
     def __init__(self):
-        self.registers = [0, 104, 0, 0, 0, 0, 0, 0]
+        self.registers = [0, 0, 0, 0, 0, 0, 0, 0]
         self.pc = 0
         self.io = 0
         self.left_out = 0
@@ -107,10 +107,15 @@ class ControlUnit:
             return self.alu.mod(arg1, arg2)
         return 0
 
-    def execute_memory(self, opcode, arg1, arg2):
+    def execute_memory(self, opcode, arg1, arg2, arg3):
         if opcode == Opcode.LOAD:
-            data = self.data_path.read(arg2)
-            self.data_path.registers.latch_register(arg1, data)
+            if arg3 == AddressMode.DIRECT:
+                self.data_path.registers.latch_register(arg1, arg2)
+            elif arg3 == AddressMode.DATA:
+                self.data_path.registers.latch_register(arg2, arg1)
+            elif arg3 == AddressMode.REG:
+                pos = self.data_path.registers.registers[arg2]
+                self.data_path.registers.latch_register(arg1, self.data_path.read(pos)["args"])
         if opcode == Opcode.STORE:
             data = self.data_path.registers.registers[arg1]
             self.data_path.write(arg2, data)
@@ -138,11 +143,13 @@ class ControlUnit:
 
     def execute_cmp(self, opcode, arg1, arg2):
         if opcode == Opcode.CMP:
-            self.alu.cmp(arg1, arg2)
+            left = self.data_path.registers.registers[arg1]
+            right = self.data_path.registers.registers[arg2]
+            self.alu.cmp(left, right)
 
     def execute_move(self, opcode, arg1, arg2, arg3):
         if opcode == Opcode.MOVE:
-            if arg3:
+            if arg3 == AddressMode.DIRECT:
                 self.data_path.registers.latch_register(arg1, arg2)
             else:
                 self.data_path.registers.latch_register(arg1, self.data_path.registers.registers[arg2])
@@ -168,7 +175,7 @@ class ControlUnit:
         elif opcode in (Opcode.INC):
             self.execute_inc(opcode, *args)
         elif opcode in (Opcode.JMP, Opcode.JZ, Opcode.JNZ):
-            self.execute_jump(opcode, *args)
+            self.execute_jump(opcode, args[1] - 1)
         elif opcode in (Opcode.MOVE):
             self.execute_move(opcode, *args)
         elif opcode in (Opcode.HALT):
@@ -190,18 +197,30 @@ def simulation(code, input_, data_memory_size, limit):
 
 def main(code_file, input_file):
     code = read_code(code_file)
+    # parsing data into separate instructions, probably should be moved to translator
+    new_code = []
+    for i in range(len(code)):
+        if code[i]["opcode"] == Opcode.DATA:
+            data_ = code[i]
+            new_code.append({"index": data_["index"], "opcode": Opcode.DATA, "args": (data_["args"][1])})
+            new_code.extend(
+                [{"index": data_["index"] + j + 1, "opcode": Opcode.DATA, "args": (ord(data_["args"][0][j]))} for j in
+                 range(len(data_["args"][0]))])
+        else:
+            new_code.append(code[i])
+
     with open(input_file, encoding="utf-8") as file:
         input_text = file.read()
         input_token = []
         for char in input_text:
             input_token.append(char)
         output, instr_counter, ticks = simulation(
-            code,
+            new_code,
             input_token,
             100,
-            50,
+            100,
         )
-
+        print(output)
         print("".join(output))
         print("instr_counter: ", instr_counter, "ticks:", ticks)
 
