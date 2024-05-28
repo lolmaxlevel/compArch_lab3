@@ -100,7 +100,7 @@
         "opcode": "jz",
         "args": [
             "absolute",
-            13
+            14
         ],
         "term": [
             8,
@@ -127,7 +127,7 @@
         "opcode": "jz",
         "args": [
             "absolute",
-            13
+            14
         ],
         "term": [
             10,
@@ -163,16 +163,28 @@
     },
     {
         "index": 12,
+        "opcode": "outn",
+        "args": [
+            4
+        ],
+        "term": [
+            14,
+            null,
+            "outn"
+        ]
+    },
+    {
+        "index": 13,
         "opcode": "halt",
         "args": [],
         "term": [
-            14,
+            15,
             null,
             "halt"
         ]
     },
     {
-        "index": 13,
+        "index": 14,
         "opcode": "add",
         "args": [
             4,
@@ -180,20 +192,20 @@
             3
         ],
         "term": [
-            16,
+            17,
             null,
             "add"
         ]
     },
     {
-        "index": 14,
+        "index": 15,
         "opcode": "jmp",
         "args": [
             "absolute",
             10
         ],
         "term": [
-            17,
+            18,
             "test",
             "jmp"
         ]

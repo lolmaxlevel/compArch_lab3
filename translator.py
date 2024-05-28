@@ -139,7 +139,7 @@ def translate(source, labels, data):
             handle_jump(opcode, args, labels, opcodes, i)
         elif opcode in (Opcode.ADD, Opcode.SUB, Opcode.MOD):
             handle_arithmetic(opcode, args, opcodes, i)
-        elif opcode in (Opcode.IN, Opcode.OUT):
+        elif opcode in (Opcode.IN, Opcode.OUT, Opcode.OUTN):
             handle_io(opcode, args, opcodes, i)
         elif opcode in (Opcode.MOVE):
             handle_move(opcode, args, opcodes, i)

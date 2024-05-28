@@ -82,8 +82,11 @@ class DataPath:
         except IndexError:
             sys.exit(-12)
 
-    def signal_output(self, reg, port=0):
-        symbol = chr(self.registers.registers[reg])
+    def signal_output(self, reg, is_direct=False, port=0):
+        if is_direct:
+            symbol = str(self.registers.registers[reg])
+        else:
+            symbol = chr(self.registers.registers[reg])
         self.output_buffer.append(symbol)
 
 
@@ -137,6 +140,9 @@ class ControlUnit:
         if opcode == Opcode.OUT:
             self.data_path.signal_output(arg1)
             self.tick()
+        if opcode == Opcode.OUTN:
+            self.data_path.signal_output(arg1, True)
+            self.tick()
 
     def execute_inc(self, opcode, arg1):
         if opcode == Opcode.INC:
@@ -170,7 +176,7 @@ class ControlUnit:
 
         elif opcode in (Opcode.LOAD, Opcode.STORE):
             self.execute_memory(opcode, *args)
-        elif opcode in (Opcode.IN, Opcode.OUT):
+        elif opcode in (Opcode.IN, Opcode.OUT, Opcode.OUTN):
             self.execute_in_out(opcode, *args)
         elif opcode in (Opcode.CMP):
             self.execute_cmp(opcode, *args)
