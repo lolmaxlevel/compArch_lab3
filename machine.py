@@ -64,6 +64,7 @@ class DataPath:
         assert memory_size > 0
         self.memory = [0] * memory_size
         self.registers = [0] * 8
+        print(memory)
         for i in range(len(memory)):
             self.memory[i] = memory[i]
         self.registers = Registers()
@@ -118,6 +119,7 @@ class ControlUnit:
                 self.data_path.registers.latch_register(arg2, arg1)
             elif arg3 == AddressMode.REG:
                 pos = self.data_path.registers.registers[arg2]
+                print("pos", pos, self.data_path.read(pos))
                 self.data_path.registers.latch_register(arg1, self.data_path.read(pos)["args"])
         if opcode == Opcode.STORE:
             data = self.data_path.registers.registers[arg1]
@@ -228,7 +230,7 @@ def main(code_file, input_file):
         output, instr_counter, ticks = simulation(
             new_code,
             input_token,
-            100,
+            155,
             10000,
         )
         print(output)

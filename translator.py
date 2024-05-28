@@ -167,7 +167,9 @@ def add_data(opcodes, data):
             for i in range(len(data))
         ]
     )
-    data_labels = {data[i]["label"]: len(opcodes) - len(data) + i for i in range(len(data))}
+
+    lengths = [k["length"] for k in data]
+    data_labels = {data[i]["label"]: len(opcodes) - len(data) + sum(lengths[:i]) + i for i in range(len(data))}
     for opcode in opcodes:
         if opcode["opcode"] in (Opcode.LOAD, Opcode.STORE):
             if not isinstance(opcode["args"][1], int) and opcode["args"][1].startswith("$"):
@@ -193,7 +195,6 @@ def main(source, target):
     cleaned_source = clean_source(source)
     source_without_data = remove_data(cleaned_source)
     labels = parse_labels(source_without_data)
-    print(labels)
     data = parse_data(cleaned_source)
     code = translate(source_without_data, labels, data)
     isa.write_code(target, code)

@@ -1,3 +1,13 @@
 .data
 
 .code
+    move r0 #0 ; next symbol
+    move r1 #9786 ; end char
+    loop:
+        in r2
+        cmp r2 r1
+        jz end
+        out r2
+        jmp loop
+    end:
+        halt

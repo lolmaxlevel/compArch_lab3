@@ -1,42 +1,42 @@
 [
     {
         "index": 0,
-        "opcode": "move",
+        "opcode": "load",
         "args": [
+            41,
             0,
-            3,
-            "direct"
+            "data"
         ],
         "term": [
-            0,
+            1,
             null,
-            "move"
+            "load"
         ]
     },
     {
         "index": 1,
-        "opcode": "move",
+        "opcode": "load",
         "args": [
-            1,
-            5,
-            "direct"
+            2,
+            0,
+            "register"
         ],
         "term": [
-            1,
+            2,
             null,
-            "move"
+            "load"
         ]
     },
     {
         "index": 2,
         "opcode": "move",
         "args": [
-            2,
-            1000,
+            1,
+            0,
             "direct"
         ],
         "term": [
-            2,
+            3,
             null,
             "move"
         ]
@@ -50,7 +50,7 @@
             "direct"
         ],
         "term": [
-            3,
+            4,
             null,
             "move"
         ]
@@ -64,7 +64,7 @@
             "direct"
         ],
         "term": [
-            4,
+            5,
             null,
             "move"
         ]
@@ -73,141 +73,406 @@
         "index": 5,
         "opcode": "inc",
         "args": [
-            3
+            1
         ],
         "term": [
-            6,
+            7,
             null,
             "inc"
         ]
     },
     {
         "index": 6,
-        "opcode": "mod",
+        "opcode": "add",
         "args": [
-            7,
             3,
+            1,
             0
         ],
         "term": [
-            7,
+            8,
             null,
-            "mod"
+            "add"
         ]
     },
     {
         "index": 7,
-        "opcode": "jz",
+        "opcode": "load",
         "args": [
-            "absolute",
-            14
-        ],
-        "term": [
-            8,
-            "mult",
-            "jz"
-        ]
-    },
-    {
-        "index": 8,
-        "opcode": "mod",
-        "args": [
-            7,
+            4,
             3,
-            1
+            "register"
         ],
         "term": [
             9,
             null,
-            "mod"
+            "load"
+        ]
+    },
+    {
+        "index": 8,
+        "opcode": "out",
+        "args": [
+            4
+        ],
+        "term": [
+            10,
+            null,
+            "out"
         ]
     },
     {
         "index": 9,
-        "opcode": "jz",
-        "args": [
-            "absolute",
-            14
-        ],
-        "term": [
-            10,
-            "mult",
-            "jz"
-        ]
-    },
-    {
-        "index": 10,
         "opcode": "cmp",
         "args": [
-            3,
+            1,
             2
         ],
         "term": [
-            12,
+            11,
             null,
             "cmp"
         ]
     },
     {
-        "index": 11,
+        "index": 10,
         "opcode": "jnz",
         "args": [
             "absolute",
             5
         ],
         "term": [
-            13,
-            "loop",
+            12,
+            "ask_loop",
             "jnz"
         ]
     },
     {
-        "index": 12,
-        "opcode": "outn",
+        "index": 11,
+        "opcode": "jmp",
         "args": [
-            4
+            "absolute",
+            12
         ],
         "term": [
-            14,
+            13,
+            "say_hello",
+            "jmp"
+        ]
+    },
+    {
+        "index": 12,
+        "opcode": "load",
+        "args": [
+            33,
+            0,
+            "data"
+        ],
+        "term": [
+            15,
             null,
-            "outn"
+            "load"
         ]
     },
     {
         "index": 13,
-        "opcode": "halt",
-        "args": [],
+        "opcode": "load",
+        "args": [
+            2,
+            0,
+            "register"
+        ],
         "term": [
-            15,
+            16,
             null,
-            "halt"
+            "load"
         ]
     },
     {
         "index": 14,
-        "opcode": "add",
+        "opcode": "move",
         "args": [
-            4,
-            4,
-            3
+            1,
+            0,
+            "direct"
         ],
         "term": [
             17,
+            null,
+            "move"
+        ]
+    },
+    {
+        "index": 15,
+        "opcode": "move",
+        "args": [
+            3,
+            0,
+            "direct"
+        ],
+        "term": [
+            18,
+            null,
+            "move"
+        ]
+    },
+    {
+        "index": 16,
+        "opcode": "move",
+        "args": [
+            4,
+            0,
+            "direct"
+        ],
+        "term": [
+            19,
+            null,
+            "move"
+        ]
+    },
+    {
+        "index": 17,
+        "opcode": "inc",
+        "args": [
+            1
+        ],
+        "term": [
+            21,
+            null,
+            "inc"
+        ]
+    },
+    {
+        "index": 18,
+        "opcode": "add",
+        "args": [
+            3,
+            1,
+            0
+        ],
+        "term": [
+            22,
             null,
             "add"
         ]
     },
     {
-        "index": 15,
+        "index": 19,
+        "opcode": "load",
+        "args": [
+            4,
+            3,
+            "register"
+        ],
+        "term": [
+            23,
+            null,
+            "load"
+        ]
+    },
+    {
+        "index": 20,
+        "opcode": "out",
+        "args": [
+            4
+        ],
+        "term": [
+            24,
+            null,
+            "out"
+        ]
+    },
+    {
+        "index": 21,
+        "opcode": "cmp",
+        "args": [
+            1,
+            2
+        ],
+        "term": [
+            25,
+            null,
+            "cmp"
+        ]
+    },
+    {
+        "index": 22,
+        "opcode": "jnz",
+        "args": [
+            "absolute",
+            17
+        ],
+        "term": [
+            26,
+            "hello_loop",
+            "jnz"
+        ]
+    },
+    {
+        "index": 23,
         "opcode": "jmp",
         "args": [
             "absolute",
-            10
+            24
         ],
         "term": [
-            18,
-            "test",
+            27,
+            "print_name",
             "jmp"
+        ]
+    },
+    {
+        "index": 24,
+        "opcode": "move",
+        "args": [
+            0,
+            0,
+            "direct"
+        ],
+        "term": [
+            29,
+            null,
+            "move"
+        ]
+    },
+    {
+        "index": 25,
+        "opcode": "move",
+        "args": [
+            1,
+            9786,
+            "direct"
+        ],
+        "term": [
+            30,
+            null,
+            "move"
+        ]
+    },
+    {
+        "index": 26,
+        "opcode": "move",
+        "args": [
+            2,
+            0,
+            "direct"
+        ],
+        "term": [
+            31,
+            null,
+            "move"
+        ]
+    },
+    {
+        "index": 27,
+        "opcode": "in",
+        "args": [
+            2
+        ],
+        "term": [
+            33,
+            null,
+            "in"
+        ]
+    },
+    {
+        "index": 28,
+        "opcode": "cmp",
+        "args": [
+            2,
+            1
+        ],
+        "term": [
+            34,
+            null,
+            "cmp"
+        ]
+    },
+    {
+        "index": 29,
+        "opcode": "jz",
+        "args": [
+            "absolute",
+            32
+        ],
+        "term": [
+            35,
+            "end",
+            "jz"
+        ]
+    },
+    {
+        "index": 30,
+        "opcode": "out",
+        "args": [
+            2
+        ],
+        "term": [
+            36,
+            null,
+            "out"
+        ]
+    },
+    {
+        "index": 31,
+        "opcode": "jmp",
+        "args": [
+            "absolute",
+            27
+        ],
+        "term": [
+            37,
+            "name_loop",
+            "jmp"
+        ]
+    },
+    {
+        "index": 32,
+        "opcode": "halt",
+        "args": [],
+        "term": [
+            39,
+            null,
+            "halt"
+        ]
+    },
+    {
+        "index": 33,
+        "opcode": "data",
+        "args": [
+            "hello, ",
+            7
+        ],
+        "term": [
+            0,
+            "hello",
+            "data"
+        ]
+    },
+    {
+        "index": 41,
+        "opcode": "data",
+        "args": [
+            "what's ur name? ",
+            16
+        ],
+        "term": [
+            1,
+            "question",
+            "data"
+        ]
+    },
+    {
+        "index": 58,
+        "opcode": "data",
+        "args": [
+            "abeba",
+            5
+        ],
+        "term": [
+            2,
+            "abeba",
+            "data"
         ]
     }
 ]
