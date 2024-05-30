@@ -1,0 +1,16 @@
+.data
+    hello "hello world" 11
+
+.code
+    load r0 $hello ; load the address of the string into r0
+    load r2 r0   ; copy the address bcs it stores amount of chars
+    move r1 #0  ; set r1 to 0, this will be our loop counter
+    loop:
+        inc r1
+        add r3 r1 r0
+        load r4 r3
+        out r4
+        cmp r1 r2
+        jnz loop
+    end:
+        halt

@@ -1,0 +1,251 @@
+in_source: |-
+  .data
+      hello "hello world" 11
+
+  .code
+      load r0 $hello ; load the address of the string into r0
+      load r2 r0   ; copy the address bcs it stores amount of chars
+      move r1 #0  ; set r1 to 0, this will be our loop counter
+      loop:
+          inc r1
+          add r3 r1 r0
+          load r4 r3
+          out r4
+          cmp r1 r2
+          jnz loop
+      end:
+          halt
+in_stdin: |-
+  foo
+out_code: |-
+  [
+      {
+          "index": 0,
+          "opcode": "load",
+          "args": [
+              10,
+              0,
+              "data"
+          ],
+          "term": [
+              0,
+              null,
+              "load"
+          ]
+      },
+      {
+          "index": 1,
+          "opcode": "load",
+          "args": [
+              2,
+              0,
+              "register"
+          ],
+          "term": [
+              1,
+              null,
+              "load"
+          ]
+      },
+      {
+          "index": 2,
+          "opcode": "move",
+          "args": [
+              1,
+              0,
+              "direct"
+          ],
+          "term": [
+              2,
+              null,
+              "move"
+          ]
+      },
+      {
+          "index": 3,
+          "opcode": "inc",
+          "args": [
+              1
+          ],
+          "term": [
+              4,
+              null,
+              "inc"
+          ]
+      },
+      {
+          "index": 4,
+          "opcode": "add",
+          "args": [
+              3,
+              1,
+              0
+          ],
+          "term": [
+              5,
+              null,
+              "add"
+          ]
+      },
+      {
+          "index": 5,
+          "opcode": "load",
+          "args": [
+              4,
+              3,
+              "register"
+          ],
+          "term": [
+              6,
+              null,
+              "load"
+          ]
+      },
+      {
+          "index": 6,
+          "opcode": "out",
+          "args": [
+              4
+          ],
+          "term": [
+              7,
+              null,
+              "out"
+          ]
+      },
+      {
+          "index": 7,
+          "opcode": "cmp",
+          "args": [
+              1,
+              2
+          ],
+          "term": [
+              8,
+              null,
+              "cmp"
+          ]
+      },
+      {
+          "index": 8,
+          "opcode": "jnz",
+          "args": [
+              "absolute",
+              3
+          ],
+          "term": [
+              9,
+              "loop",
+              "jnz"
+          ]
+      },
+      {
+          "index": 9,
+          "opcode": "halt",
+          "args": [],
+          "term": [
+              11,
+              null,
+              "halt"
+          ]
+      },
+      {
+          "index": 10,
+          "opcode": "data",
+          "args": [
+              "hello world",
+              11
+          ],
+          "term": [
+              0,
+              "hello",
+              "data"
+          ]
+      }
+  ]
+out_stdout: |
+  source LoC: 16 code instr: 11
+  ============================================================
+  hello world
+  instr_counter:  9 ticks: 92
+out_log: |
+  DEBUG   machine:simulation    Tick:   1 PC:   0 R0:  10 R1:   0 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 Zero: False load [10, 0, 'data']
+  DEBUG   machine:simulation    Tick:   2 PC:   1 R0:  10 R1:   0 R2:  11 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 Zero: False load [2, 0, 'register']
+  DEBUG   machine:simulation    Tick:   3 PC:   2 R0:  10 R1:   0 R2:  11 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 Zero: False move [1, 0, 'direct']
+  DEBUG   machine:simulation    Tick:   4 PC:   3 R0:  10 R1:   1 R2:  11 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 Zero: False inc [1]
+  DEBUG   machine:simulation    Tick:   5 PC:   4 R0:  10 R1:   1 R2:  11 R3:  11 R4:   0 R5:   0 R6:   0 R7:   0 Zero: False add [3, 1, 0]
+  DEBUG   machine:simulation    Tick:   6 PC:   5 R0:  10 R1:   1 R2:  11 R3:  11 R4: 104 R5:   0 R6:   0 R7:   0 Zero: False load [4, 3, 'register']
+  DEBUG   machine:signal_output output: '' << 'h'
+  DEBUG   machine:simulation    Tick:   8 PC:   6 R0:  10 R1:   1 R2:  11 R3:  11 R4: 104 R5:   0 R6:   0 R7:   0 Zero: False out [4]
+  DEBUG   machine:simulation    Tick:   9 PC:   7 R0:  10 R1:   1 R2:  11 R3:  11 R4: 104 R5:   0 R6:   0 R7:   0 Zero: False cmp [1, 2]
+  DEBUG   machine:simulation    Tick:  11 PC:   2 R0:  10 R1:   1 R2:  11 R3:  11 R4: 104 R5:   0 R6:   0 R7:   0 Zero: False jnz ['absolute', 3]
+  DEBUG   machine:simulation    Tick:  12 PC:   3 R0:  10 R1:   2 R2:  11 R3:  11 R4: 104 R5:   0 R6:   0 R7:   0 Zero: False inc [1]
+  DEBUG   machine:simulation    Tick:  13 PC:   4 R0:  10 R1:   2 R2:  11 R3:  12 R4: 104 R5:   0 R6:   0 R7:   0 Zero: False add [3, 1, 0]
+  DEBUG   machine:simulation    Tick:  14 PC:   5 R0:  10 R1:   2 R2:  11 R3:  12 R4: 101 R5:   0 R6:   0 R7:   0 Zero: False load [4, 3, 'register']
+  DEBUG   machine:signal_output output: 'h' << 'e'
+  DEBUG   machine:simulation    Tick:  16 PC:   6 R0:  10 R1:   2 R2:  11 R3:  12 R4: 101 R5:   0 R6:   0 R7:   0 Zero: False out [4]
+  DEBUG   machine:simulation    Tick:  17 PC:   7 R0:  10 R1:   2 R2:  11 R3:  12 R4: 101 R5:   0 R6:   0 R7:   0 Zero: False cmp [1, 2]
+  DEBUG   machine:simulation    Tick:  19 PC:   2 R0:  10 R1:   2 R2:  11 R3:  12 R4: 101 R5:   0 R6:   0 R7:   0 Zero: False jnz ['absolute', 3]
+  DEBUG   machine:simulation    Tick:  20 PC:   3 R0:  10 R1:   3 R2:  11 R3:  12 R4: 101 R5:   0 R6:   0 R7:   0 Zero: False inc [1]
+  DEBUG   machine:simulation    Tick:  21 PC:   4 R0:  10 R1:   3 R2:  11 R3:  13 R4: 101 R5:   0 R6:   0 R7:   0 Zero: False add [3, 1, 0]
+  DEBUG   machine:simulation    Tick:  22 PC:   5 R0:  10 R1:   3 R2:  11 R3:  13 R4: 108 R5:   0 R6:   0 R7:   0 Zero: False load [4, 3, 'register']
+  DEBUG   machine:signal_output output: 'he' << 'l'
+  DEBUG   machine:simulation    Tick:  24 PC:   6 R0:  10 R1:   3 R2:  11 R3:  13 R4: 108 R5:   0 R6:   0 R7:   0 Zero: False out [4]
+  DEBUG   machine:simulation    Tick:  25 PC:   7 R0:  10 R1:   3 R2:  11 R3:  13 R4: 108 R5:   0 R6:   0 R7:   0 Zero: False cmp [1, 2]
+  DEBUG   machine:simulation    Tick:  27 PC:   2 R0:  10 R1:   3 R2:  11 R3:  13 R4: 108 R5:   0 R6:   0 R7:   0 Zero: False jnz ['absolute', 3]
+  DEBUG   machine:simulation    Tick:  28 PC:   3 R0:  10 R1:   4 R2:  11 R3:  13 R4: 108 R5:   0 R6:   0 R7:   0 Zero: False inc [1]
+  DEBUG   machine:simulation    Tick:  29 PC:   4 R0:  10 R1:   4 R2:  11 R3:  14 R4: 108 R5:   0 R6:   0 R7:   0 Zero: False add [3, 1, 0]
+  DEBUG   machine:simulation    Tick:  30 PC:   5 R0:  10 R1:   4 R2:  11 R3:  14 R4: 108 R5:   0 R6:   0 R7:   0 Zero: False load [4, 3, 'register']
+  DEBUG   machine:signal_output output: 'hel' << 'l'
+  DEBUG   machine:simulation    Tick:  32 PC:   6 R0:  10 R1:   4 R2:  11 R3:  14 R4: 108 R5:   0 R6:   0 R7:   0 Zero: False out [4]
+  DEBUG   machine:simulation    Tick:  33 PC:   7 R0:  10 R1:   4 R2:  11 R3:  14 R4: 108 R5:   0 R6:   0 R7:   0 Zero: False cmp [1, 2]
+  DEBUG   machine:simulation    Tick:  35 PC:   2 R0:  10 R1:   4 R2:  11 R3:  14 R4: 108 R5:   0 R6:   0 R7:   0 Zero: False jnz ['absolute', 3]
+  DEBUG   machine:simulation    Tick:  36 PC:   3 R0:  10 R1:   5 R2:  11 R3:  14 R4: 108 R5:   0 R6:   0 R7:   0 Zero: False inc [1]
+  DEBUG   machine:simulation    Tick:  37 PC:   4 R0:  10 R1:   5 R2:  11 R3:  15 R4: 108 R5:   0 R6:   0 R7:   0 Zero: False add [3, 1, 0]
+  DEBUG   machine:simulation    Tick:  38 PC:   5 R0:  10 R1:   5 R2:  11 R3:  15 R4: 111 R5:   0 R6:   0 R7:   0 Zero: False load [4, 3, 'register']
+  DEBUG   machine:signal_output output: 'hell' << 'o'
+  DEBUG   machine:simulation    Tick:  40 PC:   6 R0:  10 R1:   5 R2:  11 R3:  15 R4: 111 R5:   0 R6:   0 R7:   0 Zero: False out [4]
+  DEBUG   machine:simulation    Tick:  41 PC:   7 R0:  10 R1:   5 R2:  11 R3:  15 R4: 111 R5:   0 R6:   0 R7:   0 Zero: False cmp [1, 2]
+  DEBUG   machine:simulation    Tick:  43 PC:   2 R0:  10 R1:   5 R2:  11 R3:  15 R4: 111 R5:   0 R6:   0 R7:   0 Zero: False jnz ['absolute', 3]
+  DEBUG   machine:simulation    Tick:  44 PC:   3 R0:  10 R1:   6 R2:  11 R3:  15 R4: 111 R5:   0 R6:   0 R7:   0 Zero: False inc [1]
+  DEBUG   machine:simulation    Tick:  45 PC:   4 R0:  10 R1:   6 R2:  11 R3:  16 R4: 111 R5:   0 R6:   0 R7:   0 Zero: False add [3, 1, 0]
+  DEBUG   machine:simulation    Tick:  46 PC:   5 R0:  10 R1:   6 R2:  11 R3:  16 R4:  32 R5:   0 R6:   0 R7:   0 Zero: False load [4, 3, 'register']
+  DEBUG   machine:signal_output output: 'hello' << ' '
+  DEBUG   machine:simulation    Tick:  48 PC:   6 R0:  10 R1:   6 R2:  11 R3:  16 R4:  32 R5:   0 R6:   0 R7:   0 Zero: False out [4]
+  DEBUG   machine:simulation    Tick:  49 PC:   7 R0:  10 R1:   6 R2:  11 R3:  16 R4:  32 R5:   0 R6:   0 R7:   0 Zero: False cmp [1, 2]
+  DEBUG   machine:simulation    Tick:  51 PC:   2 R0:  10 R1:   6 R2:  11 R3:  16 R4:  32 R5:   0 R6:   0 R7:   0 Zero: False jnz ['absolute', 3]
+  DEBUG   machine:simulation    Tick:  52 PC:   3 R0:  10 R1:   7 R2:  11 R3:  16 R4:  32 R5:   0 R6:   0 R7:   0 Zero: False inc [1]
+  DEBUG   machine:simulation    Tick:  53 PC:   4 R0:  10 R1:   7 R2:  11 R3:  17 R4:  32 R5:   0 R6:   0 R7:   0 Zero: False add [3, 1, 0]
+  DEBUG   machine:simulation    Tick:  54 PC:   5 R0:  10 R1:   7 R2:  11 R3:  17 R4: 119 R5:   0 R6:   0 R7:   0 Zero: False load [4, 3, 'register']
+  DEBUG   machine:signal_output output: 'hello ' << 'w'
+  DEBUG   machine:simulation    Tick:  56 PC:   6 R0:  10 R1:   7 R2:  11 R3:  17 R4: 119 R5:   0 R6:   0 R7:   0 Zero: False out [4]
+  DEBUG   machine:simulation    Tick:  57 PC:   7 R0:  10 R1:   7 R2:  11 R3:  17 R4: 119 R5:   0 R6:   0 R7:   0 Zero: False cmp [1, 2]
+  DEBUG   machine:simulation    Tick:  59 PC:   2 R0:  10 R1:   7 R2:  11 R3:  17 R4: 119 R5:   0 R6:   0 R7:   0 Zero: False jnz ['absolute', 3]
+  DEBUG   machine:simulation    Tick:  60 PC:   3 R0:  10 R1:   8 R2:  11 R3:  17 R4: 119 R5:   0 R6:   0 R7:   0 Zero: False inc [1]
+  DEBUG   machine:simulation    Tick:  61 PC:   4 R0:  10 R1:   8 R2:  11 R3:  18 R4: 119 R5:   0 R6:   0 R7:   0 Zero: False add [3, 1, 0]
+  DEBUG   machine:simulation    Tick:  62 PC:   5 R0:  10 R1:   8 R2:  11 R3:  18 R4: 111 R5:   0 R6:   0 R7:   0 Zero: False load [4, 3, 'register']
+  DEBUG   machine:signal_output output: 'hello w' << 'o'
+  DEBUG   machine:simulation    Tick:  64 PC:   6 R0:  10 R1:   8 R2:  11 R3:  18 R4: 111 R5:   0 R6:   0 R7:   0 Zero: False out [4]
+  DEBUG   machine:simulation    Tick:  65 PC:   7 R0:  10 R1:   8 R2:  11 R3:  18 R4: 111 R5:   0 R6:   0 R7:   0 Zero: False cmp [1, 2]
+  DEBUG   machine:simulation    Tick:  67 PC:   2 R0:  10 R1:   8 R2:  11 R3:  18 R4: 111 R5:   0 R6:   0 R7:   0 Zero: False jnz ['absolute', 3]
+  DEBUG   machine:simulation    Tick:  68 PC:   3 R0:  10 R1:   9 R2:  11 R3:  18 R4: 111 R5:   0 R6:   0 R7:   0 Zero: False inc [1]
+  DEBUG   machine:simulation    Tick:  69 PC:   4 R0:  10 R1:   9 R2:  11 R3:  19 R4: 111 R5:   0 R6:   0 R7:   0 Zero: False add [3, 1, 0]
+  DEBUG   machine:simulation    Tick:  70 PC:   5 R0:  10 R1:   9 R2:  11 R3:  19 R4: 114 R5:   0 R6:   0 R7:   0 Zero: False load [4, 3, 'register']
+  DEBUG   machine:signal_output output: 'hello wo' << 'r'
+  DEBUG   machine:simulation    Tick:  72 PC:   6 R0:  10 R1:   9 R2:  11 R3:  19 R4: 114 R5:   0 R6:   0 R7:   0 Zero: False out [4]
+  DEBUG   machine:simulation    Tick:  73 PC:   7 R0:  10 R1:   9 R2:  11 R3:  19 R4: 114 R5:   0 R6:   0 R7:   0 Zero: False cmp [1, 2]
+  DEBUG   machine:simulation    Tick:  75 PC:   2 R0:  10 R1:   9 R2:  11 R3:  19 R4: 114 R5:   0 R6:   0 R7:   0 Zero: False jnz ['absolute', 3]
+  DEBUG   machine:simulation    Tick:  76 PC:   3 R0:  10 R1:  10 R2:  11 R3:  19 R4: 114 R5:   0 R6:   0 R7:   0 Zero: False inc [1]
+  DEBUG   machine:simulation    Tick:  77 PC:   4 R0:  10 R1:  10 R2:  11 R3:  20 R4: 114 R5:   0 R6:   0 R7:   0 Zero: False add [3, 1, 0]
+  DEBUG   machine:simulation    Tick:  78 PC:   5 R0:  10 R1:  10 R2:  11 R3:  20 R4: 108 R5:   0 R6:   0 R7:   0 Zero: False load [4, 3, 'register']
+  DEBUG   machine:signal_output output: 'hello wor' << 'l'
+  DEBUG   machine:simulation    Tick:  80 PC:   6 R0:  10 R1:  10 R2:  11 R3:  20 R4: 108 R5:   0 R6:   0 R7:   0 Zero: False out [4]
+  DEBUG   machine:simulation    Tick:  81 PC:   7 R0:  10 R1:  10 R2:  11 R3:  20 R4: 108 R5:   0 R6:   0 R7:   0 Zero: False cmp [1, 2]
+  DEBUG   machine:simulation    Tick:  83 PC:   2 R0:  10 R1:  10 R2:  11 R3:  20 R4: 108 R5:   0 R6:   0 R7:   0 Zero: False jnz ['absolute', 3]
+  DEBUG   machine:simulation    Tick:  84 PC:   3 R0:  10 R1:  11 R2:  11 R3:  20 R4: 108 R5:   0 R6:   0 R7:   0 Zero: False inc [1]
+  DEBUG   machine:simulation    Tick:  85 PC:   4 R0:  10 R1:  11 R2:  11 R3:  21 R4: 108 R5:   0 R6:   0 R7:   0 Zero: False add [3, 1, 0]
+  DEBUG   machine:simulation    Tick:  86 PC:   5 R0:  10 R1:  11 R2:  11 R3:  21 R4: 100 R5:   0 R6:   0 R7:   0 Zero: False load [4, 3, 'register']
+  DEBUG   machine:signal_output output: 'hello worl' << 'd'
+  DEBUG   machine:simulation    Tick:  88 PC:   6 R0:  10 R1:  11 R2:  11 R3:  21 R4: 100 R5:   0 R6:   0 R7:   0 Zero: False out [4]
+  DEBUG   machine:simulation    Tick:  89 PC:   7 R0:  10 R1:  11 R2:  11 R3:  21 R4: 100 R5:   0 R6:   0 R7:   0 Zero: True cmp [1, 2]
+  DEBUG   machine:simulation    Tick:  91 PC:   8 R0:  10 R1:  11 R2:  11 R3:  21 R4: 100 R5:   0 R6:   0 R7:   0 Zero: True jnz ['absolute', 3]
