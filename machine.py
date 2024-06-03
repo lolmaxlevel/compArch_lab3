@@ -208,7 +208,7 @@ class ControlUnit:
 
     def __repr__(self):
         """Вернуть строковое представление состояния процессора."""
-        state_repr = (
+        return (
             (
                 f"Tick: {self.ticks:3} PC: {self.instruction_counter:3} "
                 + " ".join([f"R{i}: {r:3}" for i, r in enumerate(self.data_path.registers.registers)])
@@ -220,8 +220,6 @@ class ControlUnit:
             + " "
             + str(self.args)
         )
-
-        return state_repr
 
 
 def simulation(code, input_, data_memory_size, limit):
