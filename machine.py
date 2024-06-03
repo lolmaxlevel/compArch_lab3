@@ -208,9 +208,18 @@ class ControlUnit:
 
     def __repr__(self):
         """Вернуть строковое представление состояния процессора."""
-        state_repr = ((f"Tick: {self.ticks:3} PC: {self.instruction_counter:3} " +
-                       " ".join([f"R{i}: {r:3}" for i, r in enumerate(self.data_path.registers.registers)])) +
-                      " Zero: " + str(self.alu.zero_flag) + " " + self.opcode + " " + str(self.args))
+        state_repr = (
+            (
+                f"Tick: {self.ticks:3} PC: {self.instruction_counter:3} "
+                + " ".join([f"R{i}: {r:3}" for i, r in enumerate(self.data_path.registers.registers)])
+            )
+            + " Zero: "
+            + str(self.data_path.alu.zero_flag)
+            + " "
+            + self.opcode
+            + " "
+            + str(self.args)
+        )
 
         return state_repr
 
@@ -223,6 +232,7 @@ def simulation(code, input_, data_memory_size, limit):
             control_unit.decode_and_execute_instruction()
             logging.debug(control_unit)
         except StopIteration:
+            logging.warning("HALT")
             break
         control_unit.instruction_counter += 1
     return data_path.output_buffer, control_unit.instruction_counter, control_unit.ticks
@@ -254,10 +264,12 @@ def main(code_file, input_file):
             new_code,
             input_token,
             200,
-            10000,
+            20000,
         )
         print("".join(output))
         print("instr_counter: ", instr_counter, "ticks:", ticks)
+        logging.debug("output buffer: " + "".join(output))
+        logging.debug("instr_counter: " + str(instr_counter) + " ticks: " + str(ticks))
 
 
 if __name__ == "__main__":

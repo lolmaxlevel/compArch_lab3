@@ -1,7 +1,6 @@
 .data
 
 .code
-
 move r0 #3 ; r0 = 3 (multiple of 3)
 move r1 #5 ; r1 = 5 (multiple of 5)
 move r2 #1000 ; r2 = 1000 (limit)
@@ -10,15 +9,15 @@ move r4 #0 ; r4 = 0 (result)
 
 loop:
     inc r3 ; increment counter
-    mod r7 r3 r0 ; counter % 3
-    jz mult ; add if so
-    mod r7 r3 r1 ; counter % 5
-    jz mult ; add if so
+    mod r7 r3 r0 ; r7 <- counter % 3
+    jz mult ; add counter to result if so
+    mod r7 r3 r1 ; r7 <- counter % 5
+    jz mult ; add counter to result if so
     test:
-        cmp r3 r2 ; limit == 1000
-        jnz loop
-        outn r4
-        halt
+        cmp r3 r2 ; ? limit == 1000
+        jnz loop ; next step if not
+        outn r4 ; write to buffer number from r4
+        halt ; stop if limit reached
 
 mult:
     add r4 r4 r3

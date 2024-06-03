@@ -1,10 +1,9 @@
 .data
     hello "hello, " 7
     question "what's ur name? " 16
-    abeba "abeba" 5
 
 .code
-    askuser:
+    ask_user:
         load r0 $question ; load the address of the string into r0
         load r2 r0   ; get amount of chars from memory
         move r1 #0  ; set r1 to 0, this will be our loop counter
@@ -19,11 +18,11 @@
             jnz ask_loop
             jmp say_hello
     say_hello:
-            load r0 $hello ; load the address of the string into r0
-            load r2 r0   ; get amount of chars from memory
-            move r1 #0  ; set r1 to 0, this will be our loop counter
-            move r3 #0
-            move r4 #0
+        load r0 $hello ; load the address of the string into r0
+        load r2 r0   ; get amount of chars from memory
+        move r1 #0  ; set r1 to 0, this will be our loop counter
+        move r3 #0
+        move r4 #0
         hello_loop:
             inc r1
             add r3 r1 r0
