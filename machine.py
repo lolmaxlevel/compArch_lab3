@@ -88,7 +88,7 @@ class DataPath:
             symbol = str(self.registers.registers[reg])
         else:
             symbol = chr(self.registers.registers[reg])
-        logging.debug(f"output: '{"".join(self.output_buffer)}' << '{symbol}'")
+        logging.debug(f"output: '{''.join(self.output_buffer)}' << '{symbol}'")
         self.output_buffer.append(symbol)
 
 
