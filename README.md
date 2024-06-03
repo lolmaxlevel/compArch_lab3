@@ -260,7 +260,6 @@
 
 ![alt text](./resources/datapath.png)
 
-
 ```asm
 CI при помощи Github Actions(тактически сворован с примера):
 
