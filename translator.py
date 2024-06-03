@@ -13,7 +13,7 @@ def clean_source(src):
 
 def remove_data(src):
     """Удаляет секцию .data"""
-    return src[src.index(".code") + 6:]
+    return src[src.index(".code") + 6 :]
 
 
 def get_register(args):
@@ -28,7 +28,7 @@ def parse_data(src):
     """Получает данные из секции .data"""
     data = []
     lines = src.split("\n")
-    lines = lines[lines.index(".data") + 1: lines.index(".code")]
+    lines = lines[lines.index(".data") + 1 : lines.index(".code")]
     for i, line in enumerate(lines):
         words = line.split('"')
         data.append({"index": i, "label": words[0].strip(), "value": words[1], "length": int(words[2])})
