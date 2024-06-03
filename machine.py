@@ -5,13 +5,11 @@ from isa import AddressMode, Opcode, read_code
 
 
 class Registers:
-    # 8 registers for user, 2 for alu, 1 for io
+    # 8 registers for user
     registers = None
-    io = 0
 
     def __init__(self):
         self.registers = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-        self.io = 0
 
     def latch_register(self, register, value):
         self.registers[register] = value
@@ -218,6 +216,8 @@ class ControlUnit:
         elif opcode in (Opcode.HALT):
             raise StopIteration
 
+        self.latch_pc(self.instruction_counter + 1)
+
     def __repr__(self):
         """Вернуть строковое представление состояния процессора."""
         return (
@@ -237,33 +237,35 @@ class ControlUnit:
 def simulation(code, input_, data_memory_size, limit):
     data_path = DataPath(code, data_memory_size, input_)
     control_unit = ControlUnit(data_path)
-    while control_unit.instruction_counter < len(code) and control_unit.ticks < limit:
+    inst_counter = 0
+    while control_unit.ticks < limit:
         try:
             control_unit.decode_and_execute_instruction()
             logging.debug(control_unit)
+            inst_counter += 1
         except StopIteration:
             logging.warning("HALT")
             break
-        control_unit.latch_pc(control_unit.instruction_counter + 1)
-    return data_path.port_manager.output_buffer, control_unit.instruction_counter, control_unit.ticks
+
+    return data_path.port_manager.output_buffer, inst_counter, control_unit.ticks
 
 
 def main(code_file, input_file):
     code = read_code(code_file)
-    # parsing data into separate instructions, probably should be moved to translator
-    new_code = []
+    # parsing data into separate instructions, probably should be moved to translator or CU
+    code_with_data = []
     for i in range(len(code)):
         if code[i]["opcode"] == Opcode.DATA:
             data_ = code[i]
-            new_code.append({"index": data_["index"], "opcode": Opcode.DATA, "args": (data_["args"][1])})
-            new_code.extend(
+            code_with_data.append({"index": data_["index"], "opcode": Opcode.DATA, "args": (data_["args"][1])})
+            code_with_data.extend(
                 [
                     {"index": data_["index"] + j + 1, "opcode": Opcode.DATA, "args": (ord(data_["args"][0][j]))}
                     for j in range(len(data_["args"][0]))
                 ]
             )
         else:
-            new_code.append(code[i])
+            code_with_data.append(code[i])
 
     with open(input_file, encoding="utf-8") as file:
         input_text = file.read()
@@ -271,7 +273,7 @@ def main(code_file, input_file):
         for char in input_text:
             input_token.append(char)
         output, instr_counter, ticks = simulation(
-            new_code,
+            code_with_data,
             input_token,
             200,
             20000,

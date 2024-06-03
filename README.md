@@ -245,6 +245,7 @@
 6. Записывает машинный код в файл. (функция `write_code` из модуля `isa`).
 
 ### Правила трансляции
+
 - Обязательное наличие секции data и code (могут быть пустыми).
 - В секции data могут быть только строки вида `hello "hello world" 11` (pstr).
 - Имена меток не должны повторяться.
@@ -253,12 +254,81 @@
 - При наличии данных в секции data, они будут записаны в память сразу после программы в порядке их следования.
 
 ## Модель процессора
+
 Интерфейс командной строки:`machine.py <machine_code_file> <input_file>`
 Реализовано в модуле: [machine.py](./machine.py)
 
 ### DataPath
 
 ![alt text](./resources/datapath.png)
+Реализован в классе `DataPath`.
+
+Сигналы (реализованы в виде методов в классе):
+
+Для регистров реализован отдельный класс `Registers`, для упрощения работы.
+С данными сигналами:
+
+- `latch_register` - защелкнуть значение в регистр.
+- `get_register` - получить значение из регистра.
+- Сами регистры представляют собой список из 8 элементов, каждый из которых является числом.
+
+Для АЛУ реализован отдельный класс `ALU`, для упрощения работы.
+С данными сигналами:
+
+- `add`, `sub`, `mod`, `inc`, `dec` - выполнить операцию сложения, вычитания, остатка от деления,
+  инкремента и декремента.
+- Так же присутствует флаг `zero_flag`, который устанавливается в True, если результат операции равен 0.
+
+Для Менеджера портов реализован отдельный класс `PortManager`, для упрощения работы.
+С данными сигналами:
+
+- `signal_input` - прочитать значение из порта 0, при этом происходит конвертирование символа в число.
+- `signal_output` - записать значение в порт 0, при этом происходит конвертирование числа в символ, либо прямой вывод
+  числа.
+
+И главный класс `DataPath` реализует сигналы:
+
+- `read` - прочитать значение из памяти.
+- `write` - записать значение в память.
+- Так же реализует память в виде списка, где каждый элемент является объектом команды.
+
+### ControlUnit
+
+![alt text](./resources/controlUnit.png)
+Реализован в классе `ControlUnit`.
+
+- Hardwired.
+- Выполнение и декодирование инструкций происходит в методе `decode_and_execute_instruction`.
+- В зависимости от инструкции, вызываются методы класса `DataPath` для выполнения операций.
+- Выполнение команд происходит в методах execute_`command_name`.
+- `latch_pc` - защелкнуть значение PC.
+- `tick` - используется для отслеживания тактов.
+- Обработка команд не останавливается, пока не встретится команда `halt`.
+
+Особенности работы модели:
+
+- Перед началом симуляции процессора, происходит обработка данных и посимвольное добавление их в конец программы.
+- Цикл симуляции осуществляется в функции `simulation`.
+- Шаг моделирования соответствует одной инструкции, с выводом состояния в журнал.
+- Для журнала состояний процессора используется стандартный модуль `logging`.
+- Количество инструкций для моделирования лимитировано (по умолчанию 20000 для нормальной работы prob1).
+- Остановка моделирования осуществляется:
+    - При превышении лимита количества выполняемых инструкций (по умолчанию 20000).
+    - При появлении исключения `StopIteration` -- если выполнена инструкция `halt`.
+    - При ошибке обработки инструкции (если в программе нет halt, и она начинает читать данные).
+
+## Тестирование
+
+- Тестирование осуществляется при помощи golden test-ов.
+- Настройка golden тестирования находится в [файле](./golden_asm_test.py)
+- Конфигурация golden test-ов находится в [директории](./golden)
+    - [cat](./golden/cat.yml) - программа, которая копирует ввод в вывод.
+    - [hello_world](./golden/hello_world.yml) - базовый hello world.
+    - [prob1](./golden/prob1.yml) - вывести сумму чисел, меньших 1000 и делящихся на 3 или на 5.
+    - [hello_username](./golden/hello_username.yml) - запросить у пользователя его имя, считать его, вывести на экран
+      приветствие.
+- Запустить тесты: `poetry run pytest . -v`
+- Обновить конфигурацию golden tests: `poetry run pytest . -v --update-goldens`
 
 ```asm
 CI при помощи Github Actions(тактически сворован с примера):
@@ -333,4 +403,214 @@ jobs:
 - `pytest` -- утилита для запуска тестов.
 - `ruff` -- утилита для форматирования и проверки стиля кодирования.
 
-Пример использования и журнал работы процессора на примере программы:
+Пример использования и журнал работы процессора на примере программы `cat`:
+
+``` shell
+cat .\examples\input.txt
+ilushaвє
+
+cat .\examples\cat.zxc
+.data
+
+.code
+    move r0 #0 ; next symbol
+    move r1 #9786 ; end char
+    loop:
+        in r2
+        cmp r2 r1
+        jz end
+        out r2
+        jmp loop
+    end:
+        halt
+./translator.py .\examples\cat.zxc output.cxz
+source LoC: 13 code instr: 8
+cat output.cxz
+[
+    {
+        "index": 0,
+        "opcode": "move",
+        "args": [
+            0,
+            0,
+            "direct"
+        ],
+        "term": [
+            0,
+            null,
+            "move"
+        ]
+    },
+    {
+        "index": 1,
+        "opcode": "move",
+        "args": [
+            1,
+            9786,
+            "direct"
+        ],
+        "term": [
+            1,
+            null,
+            "move"
+        ]
+    },
+    {
+        "index": 2,
+        "opcode": "in",
+        "args": [
+            2
+        ],
+        "term": [
+            3,
+            null,
+            "in"
+        ]
+    },
+    {
+        "index": 3,
+        "opcode": "cmp",
+        "args": [
+            2,
+            1
+        ],
+        "term": [
+            4,
+            null,
+            "cmp"
+        ]
+    },
+    {
+        "index": 4,
+        "opcode": "jz",
+        "args": [
+            "absolute",
+            7
+        ],
+        "term": [
+            5,
+            "end",
+            "jz"
+        ]
+    },
+    {
+        "index": 5,
+        "opcode": "out",
+        "args": [
+            2
+        ],
+        "term": [
+            6,
+            null,
+            "out"
+        ]
+    },
+    {
+        "index": 6,
+        "opcode": "jmp",
+        "args": [
+            "absolute",
+            2
+        ],
+        "term": [
+            7,
+            "loop",
+            "jmp"
+        ]
+    },
+    {
+        "index": 7,
+        "opcode": "halt",
+        "args": [],
+        "term": [
+            9,
+            null,
+            "halt"
+        ]
+    }
+]
+python .\machine.py .\output.cxz .\examples\input.txt
+DEBUG:root:Tick:   2 PC:   0 R0:   0 R1:   0 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False move [0, 0, 'direct']
+DEBUG:root:Tick:   4 PC:   1 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False move [1, 9786, 'direct']
+DEBUG:root:input: 'i'
+DEBUG:root:Tick:   6 PC:   2 R0:   0 R1: 9786 R2: 105 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
+DEBUG:root:Tick:   9 PC:   3 R0:   0 R1: 9786 R2: 105 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False cmp [2, 1]
+DEBUG:root:Tick:  11 PC:   4 R0:   0 R1: 9786 R2: 105 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jz ['absolute', 7]
+DEBUG:root:output: '' << 'i'
+DEBUG:root:Tick:  13 PC:   5 R0:   0 R1: 9786 R2: 105 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False out [2]
+DEBUG:root:Tick:  15 PC:   1 R0:   0 R1: 9786 R2: 105 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jmp ['absolute', 2]
+DEBUG:root:input: 'l'
+DEBUG:root:Tick:  17 PC:   2 R0:   0 R1: 9786 R2: 108 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
+DEBUG:root:Tick:  20 PC:   3 R0:   0 R1: 9786 R2: 108 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False cmp [2, 1]
+DEBUG:root:Tick:  22 PC:   4 R0:   0 R1: 9786 R2: 108 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jz ['absolute', 7]
+DEBUG:root:output: 'i' << 'l'
+DEBUG:root:Tick:  24 PC:   5 R0:   0 R1: 9786 R2: 108 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False out [2]
+DEBUG:root:Tick:  26 PC:   1 R0:   0 R1: 9786 R2: 108 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jmp ['absolute', 2]
+DEBUG:root:input: 'u'
+DEBUG:root:Tick:  28 PC:   2 R0:   0 R1: 9786 R2: 117 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
+DEBUG:root:Tick:  31 PC:   3 R0:   0 R1: 9786 R2: 117 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False cmp [2, 1]
+DEBUG:root:Tick:  33 PC:   4 R0:   0 R1: 9786 R2: 117 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jz ['absolute', 7]
+DEBUG:root:output: 'il' << 'u'
+DEBUG:root:Tick:  35 PC:   5 R0:   0 R1: 9786 R2: 117 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False out [2]
+DEBUG:root:Tick:  37 PC:   1 R0:   0 R1: 9786 R2: 117 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jmp ['absolute', 2]
+DEBUG:root:input: 's'
+DEBUG:root:Tick:  39 PC:   2 R0:   0 R1: 9786 R2: 115 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
+DEBUG:root:Tick:  42 PC:   3 R0:   0 R1: 9786 R2: 115 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False cmp [2, 1]
+DEBUG:root:Tick:  44 PC:   4 R0:   0 R1: 9786 R2: 115 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jz ['absolute', 7]
+DEBUG:root:output: 'ilu' << 's'
+DEBUG:root:Tick:  46 PC:   5 R0:   0 R1: 9786 R2: 115 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False out [2]
+DEBUG:root:Tick:  48 PC:   1 R0:   0 R1: 9786 R2: 115 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jmp ['absolute', 2]
+DEBUG:root:input: 'h'
+DEBUG:root:Tick:  50 PC:   2 R0:   0 R1: 9786 R2: 104 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
+DEBUG:root:Tick:  53 PC:   3 R0:   0 R1: 9786 R2: 104 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False cmp [2, 1]
+DEBUG:root:Tick:  55 PC:   4 R0:   0 R1: 9786 R2: 104 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jz ['absolute', 7]
+DEBUG:root:output: 'ilus' << 'h'
+DEBUG:root:Tick:  57 PC:   5 R0:   0 R1: 9786 R2: 104 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False out [2]
+DEBUG:root:Tick:  59 PC:   1 R0:   0 R1: 9786 R2: 104 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jmp ['absolute', 2]
+DEBUG:root:input: 'a'
+DEBUG:root:Tick:  61 PC:   2 R0:   0 R1: 9786 R2:  97 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
+DEBUG:root:Tick:  64 PC:   3 R0:   0 R1: 9786 R2:  97 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False cmp [2, 1]
+DEBUG:root:Tick:  66 PC:   4 R0:   0 R1: 9786 R2:  97 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jz ['absolute', 7]
+DEBUG:root:output: 'ilush' << 'a'
+DEBUG:root:Tick:  68 PC:   5 R0:   0 R1: 9786 R2:  97 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False out [2]
+DEBUG:root:Tick:  70 PC:   1 R0:   0 R1: 9786 R2:  97 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jmp ['absolute', 2]
+DEBUG:root:input: '☺'
+DEBUG:root:Tick:  72 PC:   2 R0:   0 R1: 9786 R2: 9786 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
+DEBUG:root:Tick:  75 PC:   3 R0:   0 R1: 9786 R2: 9786 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: True cmp [2, 1]
+DEBUG:root:Tick:  77 PC:   6 R0:   0 R1: 9786 R2: 9786 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: True jz ['absolute', 7]
+WARNING:root:HALT
+ilusha
+instr_counter:  7 ticks: 78
+DEBUG:root:output buffer: ilusha
+DEBUG:root:instr_counter: 7 ticks: 78
+```
+
+Пример проверки исходного кода:
+
+``` shell
+poetry run pytest . -v
+============================================================================================================================================= test session starts ==============================================================================================================================================
+platform win32 -- Python 3.12.0, pytest-8.2.1, pluggy-1.5.0 -- D:\projects\compArch_lab3\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\projects\compArch_lab3
+configfile: pyproject.toml
+plugins: golden-0.2.2
+collected 4 items                                                                                                                                                                                                                                                                                               
+
+golden_asm_test.py::test_translator_asm_and_machine[golden/cat.yml] PASSED                                                                                                                                                                                                                                [ 25%]
+golden_asm_test.py::test_translator_asm_and_machine[golden/hello_username.yml] PASSED                                                                                                                                                                                                                     [ 50%]
+golden_asm_test.py::test_translator_asm_and_machine[golden/hello_world.yml] PASSED                                                                                                                                                                                                                        [ 75%]
+golden_asm_test.py::test_translator_asm_and_machine[golden/prob1.yml] PASSED                                                                                                                                                                                                                              [100%]
+
+============================================================================================================================================== 4 passed in 1.21s ===============================================================================================================================================
+```
+
+## Статистика
+
+```
+|            ФИО             | <алг>  |  <LoC>  |  <code инстр.>  |  <инстр.>  |  <такт.>   |                               <вариант>                                |
+|----------------------------|--------|---------|-----------------|------------|------------|------------------------------------------------------------------------|
+| Терновский Илья Евгеньевич | hello  |      16 |              11 |         69 |        174 | asm | risc | neum | hw | instr | struct | stream | port | pstr | prob1 |
+| Терновский Илья Евгеньевич | cat    |      13 |               8 |         35 |         78 | asm | risc | neum | hw | instr | struct | stream | port | pstr | prob1 |
+| Терновский Илья Евгеньевич | prob1  |      24 |              16 |       7274 |      16549 | asm | risc | neum | hw | instr | struct | stream | port | pstr | prob1 |
+```
