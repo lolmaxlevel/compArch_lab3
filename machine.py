@@ -68,7 +68,7 @@ class PortManager:
             self.registers.latch_register(reg, ord(self.ports[port].pop(0)))
             logging.debug(f"input: '{chr(self.registers.get_register(reg))}'")
         except IndexError:
-            logging.error("input buffer is empty")
+            logging.exception("input buffer is empty")
             sys.exit(-12)
 
     def signal_output(self, reg, is_direct=False, port=0):
