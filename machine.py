@@ -8,14 +8,10 @@ class Registers:
     # 8 registers for user, 2 for alu, 1 for io
     registers = None
     io = 0
-    left_out: int = 0
-    right_out: int = 0
 
     def __init__(self):
         self.registers = [0, 0, 0, 0, 0, 0, 0, 0, 0]
         self.io = 0
-        self.left_out = 0
-        self.right_out = 0
 
     def latch_register(self, register, value):
         self.registers[register] = value
@@ -23,9 +19,14 @@ class Registers:
     def latch_pc(self, value):
         self.registers.pc = value
 
+    def get_register(self, register):
+        return self.registers[register]
+
 
 class Alu:
     zero_flag = False
+    right = 0
+    left = 0
 
     def add(self, left, right):
         result = left + right
@@ -58,38 +59,45 @@ class Alu:
         return result
 
 
+class PortManager:
+    def __init__(self, ports, registers):
+        self.ports = ports
+        self.registers = registers
+        self.output_buffer = []
+
+    def signal_input(self, reg, port=0):
+        try:
+            self.registers.latch_register(reg, ord(self.ports[port].pop(0)))
+            logging.debug(f"input: '{chr(self.registers.get_register(reg))}'")
+        except IndexError:
+            logging.error("input buffer is empty")
+            sys.exit(-12)
+
+    def signal_output(self, reg, is_direct=False, port=0):
+        if is_direct:
+            symbol = str(self.registers.get_register(reg))
+        else:
+            symbol = chr(self.registers.get_register(reg))
+        logging.debug(f"output: '{''.join(self.output_buffer)}' << '{symbol}'")
+        self.output_buffer.append(symbol)
+
+
 class DataPath:
     def __init__(self, memory, memory_size, input_):
         assert memory_size > 0
         self.memory = [0] * memory_size
-        self.registers = [0] * 8
         for i in range(len(memory)):
             self.memory[i] = memory[i]
         self.registers = Registers()
-        self.input_ = input_
         self.output_buffer = []
         self.alu = Alu()
+        self.port_manager = PortManager([input_], self.registers)
 
     def read(self, address):
         return self.memory[address]
 
     def write(self, address, value):
         self.memory[address] = {"data": value}
-
-    def signal_input(self, reg, port=0):
-        try:
-            self.registers.latch_register(reg, ord(self.input_.pop(0)))
-            logging.debug(f"input: '{chr(self.registers.registers[reg])}'")
-        except IndexError:
-            sys.exit(-12)
-
-    def signal_output(self, reg, is_direct=False, port=0):
-        if is_direct:
-            symbol = str(self.registers.registers[reg])
-        else:
-            symbol = chr(self.registers.registers[reg])
-        logging.debug(f"output: '{''.join(self.output_buffer)}' << '{symbol}'")
-        self.output_buffer.append(symbol)
 
 
 class ControlUnit:
@@ -103,6 +111,9 @@ class ControlUnit:
 
     def tick(self):
         self.ticks += 1
+
+    def latch_pc(self, value):
+        self.instruction_counter = value
 
     def execute_arithmetic(self, opcode, arg1, arg2):
         self.tick()
@@ -123,47 +134,47 @@ class ControlUnit:
                 self.tick()
                 self.data_path.registers.latch_register(arg2, arg1)
             elif arg3 == AddressMode.REG:
-                pos = self.data_path.registers.registers[arg2]
+                pos = self.data_path.registers.get_register(arg2)
                 self.tick()
                 self.data_path.registers.latch_register(arg1, self.data_path.read(pos)["args"])
         if opcode == Opcode.STORE:
-            data = self.data_path.registers.registers[arg1]
+            data = self.data_path.registers.get_register(arg1)
             self.tick()
             self.data_path.write(arg2, data)
         self.tick()
 
     def execute_jump(self, opcode, arg1):
         if opcode == Opcode.JMP:
-            self.instruction_counter = arg1
+            self.latch_pc(arg1)
         if opcode == Opcode.JZ:
             if self.data_path.alu.zero_flag:
-                self.instruction_counter = arg1
+                self.latch_pc(arg1)
         if opcode == Opcode.JNZ:
             if not self.data_path.alu.zero_flag:
-                self.instruction_counter = arg1
+                self.latch_pc(arg1)
         self.tick()
 
     def execute_in_out(self, opcode, arg1):
         if opcode == Opcode.IN:
-            self.data_path.signal_input(arg1)
+            self.data_path.port_manager.signal_input(arg1)
         if opcode == Opcode.OUT:
-            self.data_path.signal_output(arg1)
+            self.data_path.port_manager.signal_output(arg1)
         if opcode == Opcode.OUTN:
-            self.data_path.signal_output(arg1, True)
+            self.data_path.port_manager.signal_output(arg1, True)
         self.tick()
 
     def execute_inc(self, opcode, arg1):
         if opcode == Opcode.INC:
             self.tick()
-            data = self.data_path.registers.registers[arg1]
+            data = self.data_path.registers.get_register(arg1)
             self.data_path.registers.latch_register(arg1, self.data_path.alu.inc(data))
             self.tick()
 
     def execute_cmp(self, opcode, arg1, arg2):
         if opcode == Opcode.CMP:
             self.tick()
-            left = self.data_path.registers.registers[arg1]
-            right = self.data_path.registers.registers[arg2]
+            left = self.data_path.registers.get_register(arg1)
+            right = self.data_path.registers.get_register(arg2)
             self.data_path.alu.cmp(left, right)
             self.tick()
 
@@ -172,7 +183,7 @@ class ControlUnit:
             if arg3 == AddressMode.DIRECT:
                 self.data_path.registers.latch_register(arg1, arg2)
             else:
-                data = self.data_path.registers.registers[arg2]
+                data = self.data_path.registers.get_register(arg2)
                 self.tick()
                 self.data_path.registers.latch_register(arg1, data)
             self.tick()
@@ -187,7 +198,8 @@ class ControlUnit:
             self.data_path.registers.latch_register(
                 args[0],
                 self.execute_arithmetic(
-                    opcode, self.data_path.registers.registers[args[1]], self.data_path.registers.registers[args[2]]
+                    opcode, self.data_path.registers.get_register(args[1]),
+                    self.data_path.registers.get_register(args[2])
                 ),
             )
 
@@ -209,16 +221,16 @@ class ControlUnit:
     def __repr__(self):
         """Вернуть строковое представление состояния процессора."""
         return (
-            (
-                f"Tick: {self.ticks:3} PC: {self.instruction_counter:3} "
-                + " ".join([f"R{i}: {r:3}" for i, r in enumerate(self.data_path.registers.registers)])
-            )
-            + " Zero: "
-            + str(self.data_path.alu.zero_flag)
-            + " "
-            + self.opcode
-            + " "
-            + str(self.args)
+                (
+                        f"Tick: {self.ticks:3} PC: {self.instruction_counter:3} "
+                        + " ".join([f"R{i}: {r:3}" for i, r in enumerate(self.data_path.registers.registers)])
+                )
+                + " Zero: "
+                + str(self.data_path.alu.zero_flag)
+                + " "
+                + self.opcode
+                + " "
+                + str(self.args)
         )
 
 
@@ -232,8 +244,8 @@ def simulation(code, input_, data_memory_size, limit):
         except StopIteration:
             logging.warning("HALT")
             break
-        control_unit.instruction_counter += 1
-    return data_path.output_buffer, control_unit.instruction_counter, control_unit.ticks
+        control_unit.latch_pc(control_unit.instruction_counter + 1)
+    return data_path.port_manager.output_buffer, control_unit.instruction_counter, control_unit.ticks
 
 
 def main(code_file, input_file):
