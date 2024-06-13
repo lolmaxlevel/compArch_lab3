@@ -238,16 +238,16 @@ class ControlUnit:
     def __repr__(self):
         """Вернуть строковое представление состояния процессора."""
         return (
-                (
-                        f"Tick: {self.ticks:3} PC: {self.instruction_counter:3} "
-                        + " ".join([f"R{i}: {r:3}" for i, r in enumerate(self.data_path.registers.registers)])
-                )
-                + " Zero: "
-                + str(self.data_path.alu.zero_flag)
-                + " "
-                + self.opcode
-                + " "
-                + str(self.args)
+            (
+                f"Tick: {self.ticks:3} PC: {self.instruction_counter:3} "
+                + " ".join([f"R{i}: {r:3}" for i, r in enumerate(self.data_path.registers.registers)])
+            )
+            + " Zero: "
+            + str(self.data_path.alu.zero_flag)
+            + " "
+            + self.opcode
+            + " "
+            + str(self.args)
         )
 
 
