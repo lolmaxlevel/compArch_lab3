@@ -86,8 +86,22 @@ class DataPath:
     def __init__(self, memory, memory_size, input_):
         assert memory_size > 0
         self.memory = [0] * memory_size
+        memory_with_data = []
+        # parsing data into separate instructions
         for i in range(len(memory)):
-            self.memory[i] = memory[i]
+            if memory[i]["opcode"] == Opcode.DATA:
+                data_ = memory[i]
+                memory_with_data.append({"index": data_["index"], "opcode": Opcode.DATA, "args": (data_["args"][1])})
+                memory_with_data.extend(
+                    [
+                        {"index": data_["index"] + j + 1, "opcode": Opcode.DATA, "args": (ord(data_["args"][0][j]))}
+                        for j in range(len(data_["args"][0]))
+                    ]
+                )
+            else:
+                memory_with_data.append(memory[i])
+        for i in range(len(memory_with_data)):
+            self.memory[i] = memory_with_data[i]
         self.registers = Registers()
         self.output_buffer = []
         self.alu = Alu()
@@ -224,16 +238,16 @@ class ControlUnit:
     def __repr__(self):
         """Вернуть строковое представление состояния процессора."""
         return (
-            (
-                f"Tick: {self.ticks:3} PC: {self.instruction_counter:3} "
-                + " ".join([f"R{i}: {r:3}" for i, r in enumerate(self.data_path.registers.registers)])
-            )
-            + " Zero: "
-            + str(self.data_path.alu.zero_flag)
-            + " "
-            + self.opcode
-            + " "
-            + str(self.args)
+                (
+                        f"Tick: {self.ticks:3} PC: {self.instruction_counter:3} "
+                        + " ".join([f"R{i}: {r:3}" for i, r in enumerate(self.data_path.registers.registers)])
+                )
+                + " Zero: "
+                + str(self.data_path.alu.zero_flag)
+                + " "
+                + self.opcode
+                + " "
+                + str(self.args)
         )
 
 
@@ -255,28 +269,13 @@ def simulation(code, input_, data_memory_size, limit):
 
 def main(code_file, input_file):
     code = read_code(code_file)
-    # parsing data into separate instructions, probably should be moved to translator or CU
-    code_with_data = []
-    for i in range(len(code)):
-        if code[i]["opcode"] == Opcode.DATA:
-            data_ = code[i]
-            code_with_data.append({"index": data_["index"], "opcode": Opcode.DATA, "args": (data_["args"][1])})
-            code_with_data.extend(
-                [
-                    {"index": data_["index"] + j + 1, "opcode": Opcode.DATA, "args": (ord(data_["args"][0][j]))}
-                    for j in range(len(data_["args"][0]))
-                ]
-            )
-        else:
-            code_with_data.append(code[i])
-
     with open(input_file, encoding="utf-8") as file:
         input_text = file.read()
         input_token = []
         for char in input_text:
             input_token.append(char)
         output, instr_counter, ticks = simulation(
-            code_with_data,
+            code,
             input_token,
             200,
             20000,
