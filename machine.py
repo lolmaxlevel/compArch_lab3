@@ -61,23 +61,25 @@ class PortManager:
     def __init__(self, ports, registers):
         self.ports = ports
         self.registers = registers
-        self.output_buffer = []
+        self.output_buffer = [[]]
 
-    def signal_input(self, reg, port=0):
+    def signal_input(self, port=0):
+        port = int(port)
         try:
-            self.registers.latch_register(reg, ord(self.ports[port].pop(0)))
-            logging.debug(f"input: '{chr(self.registers.get_register(reg))}'")
+            self.registers.latch_register(8, ord(self.ports[port].pop(0)))
+            logging.debug(f"input: '{chr(self.registers.get_register(8))}', from port {port}")
         except IndexError:
             logging.exception("input buffer is empty")
             sys.exit(-12)
 
-    def signal_output(self, reg, is_direct=False, port=0):
+    def signal_output(self, port=0, is_direct=False):
+        port = int(port)
         if is_direct:
-            symbol = str(self.registers.get_register(reg))
+            symbol = str(self.registers.get_register(8))
         else:
-            symbol = chr(self.registers.get_register(reg))
-        logging.debug(f"output: '{''.join(self.output_buffer)}' << '{symbol}'")
-        self.output_buffer.append(symbol)
+            symbol = chr(self.registers.get_register(8))
+        logging.debug(f"output: '{''.join(self.output_buffer[0])}' << '{symbol}', to port {port}")
+        self.output_buffer[port].append(symbol)
 
 
 class DataPath:
@@ -279,9 +281,9 @@ def main(code_file, input_file):
             200,
             20000,
         )
-        print("".join(output))
+        print("".join(output[0]))
         print("instr_counter: ", instr_counter, "ticks:", ticks)
-        logging.debug("output buffer: " + "".join(output))
+        logging.debug("output buffer: " + "".join(output[0]))
         logging.debug("instr_counter: " + str(instr_counter) + " ticks: " + str(ticks))
 
 

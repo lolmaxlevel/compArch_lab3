@@ -5,10 +5,10 @@ in_source: |-
       move r0 #0 ; next symbol
       move r1 #9786 ; end char
       loop:
-          in r2
-          cmp r2 r1
+          in 0
+          cmp r8 r1
           jz end
-          out r2
+          out 0
           jmp loop
       end:
           halt
@@ -48,7 +48,7 @@ out_code: |-
           "index": 2,
           "opcode": "in",
           "args": [
-              2
+              "0"
           ],
           "term": [
               3,
@@ -60,7 +60,7 @@ out_code: |-
           "index": 3,
           "opcode": "cmp",
           "args": [
-              2,
+              8,
               1
           ],
           "term": [
@@ -86,7 +86,7 @@ out_code: |-
           "index": 5,
           "opcode": "out",
           "args": [
-              2
+              "0"
           ],
           "term": [
               6,
@@ -126,52 +126,52 @@ out_stdout: |
 out_log: |
   DEBUG   machine:simulation    Tick:   2 PC:   1 R0:   0 R1:   0 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False move [0, 0, 'direct']
   DEBUG   machine:simulation    Tick:   4 PC:   2 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False move [1, 9786, 'direct']
-  DEBUG   machine:signal_input  input: 'i'
-  DEBUG   machine:simulation    Tick:   6 PC:   3 R0:   0 R1: 9786 R2: 105 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
-  DEBUG   machine:simulation    Tick:   9 PC:   4 R0:   0 R1: 9786 R2: 105 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False cmp [2, 1]
-  DEBUG   machine:simulation    Tick:  11 PC:   5 R0:   0 R1: 9786 R2: 105 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jz ['absolute', 7]
-  DEBUG   machine:signal_output output: '' << 'i'
-  DEBUG   machine:simulation    Tick:  13 PC:   6 R0:   0 R1: 9786 R2: 105 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False out [2]
-  DEBUG   machine:simulation    Tick:  15 PC:   2 R0:   0 R1: 9786 R2: 105 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jmp ['absolute', 2]
-  DEBUG   machine:signal_input  input: 'l'
-  DEBUG   machine:simulation    Tick:  17 PC:   3 R0:   0 R1: 9786 R2: 108 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
-  DEBUG   machine:simulation    Tick:  20 PC:   4 R0:   0 R1: 9786 R2: 108 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False cmp [2, 1]
-  DEBUG   machine:simulation    Tick:  22 PC:   5 R0:   0 R1: 9786 R2: 108 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jz ['absolute', 7]
-  DEBUG   machine:signal_output output: 'i' << 'l'
-  DEBUG   machine:simulation    Tick:  24 PC:   6 R0:   0 R1: 9786 R2: 108 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False out [2]
-  DEBUG   machine:simulation    Tick:  26 PC:   2 R0:   0 R1: 9786 R2: 108 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jmp ['absolute', 2]
-  DEBUG   machine:signal_input  input: 'u'
-  DEBUG   machine:simulation    Tick:  28 PC:   3 R0:   0 R1: 9786 R2: 117 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
-  DEBUG   machine:simulation    Tick:  31 PC:   4 R0:   0 R1: 9786 R2: 117 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False cmp [2, 1]
-  DEBUG   machine:simulation    Tick:  33 PC:   5 R0:   0 R1: 9786 R2: 117 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jz ['absolute', 7]
-  DEBUG   machine:signal_output output: 'il' << 'u'
-  DEBUG   machine:simulation    Tick:  35 PC:   6 R0:   0 R1: 9786 R2: 117 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False out [2]
-  DEBUG   machine:simulation    Tick:  37 PC:   2 R0:   0 R1: 9786 R2: 117 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jmp ['absolute', 2]
-  DEBUG   machine:signal_input  input: 's'
-  DEBUG   machine:simulation    Tick:  39 PC:   3 R0:   0 R1: 9786 R2: 115 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
-  DEBUG   machine:simulation    Tick:  42 PC:   4 R0:   0 R1: 9786 R2: 115 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False cmp [2, 1]
-  DEBUG   machine:simulation    Tick:  44 PC:   5 R0:   0 R1: 9786 R2: 115 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jz ['absolute', 7]
-  DEBUG   machine:signal_output output: 'ilu' << 's'
-  DEBUG   machine:simulation    Tick:  46 PC:   6 R0:   0 R1: 9786 R2: 115 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False out [2]
-  DEBUG   machine:simulation    Tick:  48 PC:   2 R0:   0 R1: 9786 R2: 115 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jmp ['absolute', 2]
-  DEBUG   machine:signal_input  input: 'h'
-  DEBUG   machine:simulation    Tick:  50 PC:   3 R0:   0 R1: 9786 R2: 104 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
-  DEBUG   machine:simulation    Tick:  53 PC:   4 R0:   0 R1: 9786 R2: 104 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False cmp [2, 1]
-  DEBUG   machine:simulation    Tick:  55 PC:   5 R0:   0 R1: 9786 R2: 104 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jz ['absolute', 7]
-  DEBUG   machine:signal_output output: 'ilus' << 'h'
-  DEBUG   machine:simulation    Tick:  57 PC:   6 R0:   0 R1: 9786 R2: 104 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False out [2]
-  DEBUG   machine:simulation    Tick:  59 PC:   2 R0:   0 R1: 9786 R2: 104 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jmp ['absolute', 2]
-  DEBUG   machine:signal_input  input: 'a'
-  DEBUG   machine:simulation    Tick:  61 PC:   3 R0:   0 R1: 9786 R2:  97 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
-  DEBUG   machine:simulation    Tick:  64 PC:   4 R0:   0 R1: 9786 R2:  97 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False cmp [2, 1]
-  DEBUG   machine:simulation    Tick:  66 PC:   5 R0:   0 R1: 9786 R2:  97 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jz ['absolute', 7]
-  DEBUG   machine:signal_output output: 'ilush' << 'a'
-  DEBUG   machine:simulation    Tick:  68 PC:   6 R0:   0 R1: 9786 R2:  97 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False out [2]
-  DEBUG   machine:simulation    Tick:  70 PC:   2 R0:   0 R1: 9786 R2:  97 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jmp ['absolute', 2]
-  DEBUG   machine:signal_input  input: '☺'
-  DEBUG   machine:simulation    Tick:  72 PC:   3 R0:   0 R1: 9786 R2: 9786 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
-  DEBUG   machine:simulation    Tick:  75 PC:   4 R0:   0 R1: 9786 R2: 9786 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: True cmp [2, 1]
-  DEBUG   machine:simulation    Tick:  77 PC:   7 R0:   0 R1: 9786 R2: 9786 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: True jz ['absolute', 7]
+  DEBUG   machine:signal_input  input: 'i', from port 0
+  DEBUG   machine:simulation    Tick:   6 PC:   3 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 105 Zero: False in ['0']
+  DEBUG   machine:simulation    Tick:   9 PC:   4 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 105 Zero: False cmp [8, 1]
+  DEBUG   machine:simulation    Tick:  11 PC:   5 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 105 Zero: False jz ['absolute', 7]
+  DEBUG   machine:signal_output output: '' << 'i', to port 0
+  DEBUG   machine:simulation    Tick:  13 PC:   6 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 105 Zero: False out ['0']
+  DEBUG   machine:simulation    Tick:  15 PC:   2 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 105 Zero: False jmp ['absolute', 2]
+  DEBUG   machine:signal_input  input: 'l', from port 0
+  DEBUG   machine:simulation    Tick:  17 PC:   3 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 108 Zero: False in ['0']
+  DEBUG   machine:simulation    Tick:  20 PC:   4 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 108 Zero: False cmp [8, 1]
+  DEBUG   machine:simulation    Tick:  22 PC:   5 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 108 Zero: False jz ['absolute', 7]
+  DEBUG   machine:signal_output output: 'i' << 'l', to port 0
+  DEBUG   machine:simulation    Tick:  24 PC:   6 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 108 Zero: False out ['0']
+  DEBUG   machine:simulation    Tick:  26 PC:   2 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 108 Zero: False jmp ['absolute', 2]
+  DEBUG   machine:signal_input  input: 'u', from port 0
+  DEBUG   machine:simulation    Tick:  28 PC:   3 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 117 Zero: False in ['0']
+  DEBUG   machine:simulation    Tick:  31 PC:   4 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 117 Zero: False cmp [8, 1]
+  DEBUG   machine:simulation    Tick:  33 PC:   5 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 117 Zero: False jz ['absolute', 7]
+  DEBUG   machine:signal_output output: 'il' << 'u', to port 0
+  DEBUG   machine:simulation    Tick:  35 PC:   6 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 117 Zero: False out ['0']
+  DEBUG   machine:simulation    Tick:  37 PC:   2 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 117 Zero: False jmp ['absolute', 2]
+  DEBUG   machine:signal_input  input: 's', from port 0
+  DEBUG   machine:simulation    Tick:  39 PC:   3 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 115 Zero: False in ['0']
+  DEBUG   machine:simulation    Tick:  42 PC:   4 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 115 Zero: False cmp [8, 1]
+  DEBUG   machine:simulation    Tick:  44 PC:   5 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 115 Zero: False jz ['absolute', 7]
+  DEBUG   machine:signal_output output: 'ilu' << 's', to port 0
+  DEBUG   machine:simulation    Tick:  46 PC:   6 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 115 Zero: False out ['0']
+  DEBUG   machine:simulation    Tick:  48 PC:   2 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 115 Zero: False jmp ['absolute', 2]
+  DEBUG   machine:signal_input  input: 'h', from port 0
+  DEBUG   machine:simulation    Tick:  50 PC:   3 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 104 Zero: False in ['0']
+  DEBUG   machine:simulation    Tick:  53 PC:   4 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 104 Zero: False cmp [8, 1]
+  DEBUG   machine:simulation    Tick:  55 PC:   5 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 104 Zero: False jz ['absolute', 7]
+  DEBUG   machine:signal_output output: 'ilus' << 'h', to port 0
+  DEBUG   machine:simulation    Tick:  57 PC:   6 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 104 Zero: False out ['0']
+  DEBUG   machine:simulation    Tick:  59 PC:   2 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 104 Zero: False jmp ['absolute', 2]
+  DEBUG   machine:signal_input  input: 'a', from port 0
+  DEBUG   machine:simulation    Tick:  61 PC:   3 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:  97 Zero: False in ['0']
+  DEBUG   machine:simulation    Tick:  64 PC:   4 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:  97 Zero: False cmp [8, 1]
+  DEBUG   machine:simulation    Tick:  66 PC:   5 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:  97 Zero: False jz ['absolute', 7]
+  DEBUG   machine:signal_output output: 'ilush' << 'a', to port 0
+  DEBUG   machine:simulation    Tick:  68 PC:   6 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:  97 Zero: False out ['0']
+  DEBUG   machine:simulation    Tick:  70 PC:   2 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:  97 Zero: False jmp ['absolute', 2]
+  DEBUG   machine:signal_input  input: '☺', from port 0
+  DEBUG   machine:simulation    Tick:  72 PC:   3 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 9786 Zero: False in ['0']
+  DEBUG   machine:simulation    Tick:  75 PC:   4 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 9786 Zero: True cmp [8, 1]
+  DEBUG   machine:simulation    Tick:  77 PC:   7 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 9786 Zero: True jz ['absolute', 7]
   WARNING machine:simulation    HALT
   DEBUG   machine:main          output buffer: ilusha
   DEBUG   machine:main          instr_counter: 35 ticks: 78

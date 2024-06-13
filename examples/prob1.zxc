@@ -16,7 +16,8 @@ loop:
     test:
         cmp r3 r2 ; ? limit == 1000
         jnz loop ; next step if not
-        outn r4 ; write to buffer number from r4
+        move r8 r4 ; move answer to IO reg
+        outn 0 ; write to buffer number from r4
         halt ; stop if limit reached
 
 mult:

@@ -4,10 +4,10 @@
     move r0 #0 ; next symbol
     move r1 #9786 ; end char
     loop:
-        in r2
-        cmp r2 r1
+        in 0
+        cmp r8 r1
         jz end
-        out r2
+        out 0
         jmp loop
     end:
         halt

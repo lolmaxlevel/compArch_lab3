@@ -12,8 +12,8 @@
         ask_loop:
             inc r1
             add r3 r1 r0
-            load r4 r3
-            out r4
+            load r8 r3
+            out 0
             cmp r1 r2
             jnz ask_loop
             jmp say_hello
@@ -26,8 +26,8 @@
         hello_loop:
             inc r1
             add r3 r1 r0
-            load r4 r3
-            out r4
+            load r8 r3
+            out 0
             cmp r1 r2
             jnz hello_loop
             jmp print_name
@@ -36,10 +36,10 @@
         move r1 #9786 ; end char
         move r2 #0
             name_loop:
-                in r2
-                cmp r2 r1
+                in 0
+                cmp r8 r1
                 jz end
-                out r2
+                out 0
                 jmp name_loop
     end:
         halt
