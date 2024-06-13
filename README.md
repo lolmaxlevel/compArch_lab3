@@ -11,8 +11,8 @@
 ```ebnf
 <program> ::=  <section_data> <section_code> 
 
-<section_data> ::= "." "data" { \n <data_definition> {<comment>} \n }
-<section_code> ::= "." "code" { \n <instruction> {<comment>} \n }
+<section_data> ::= "." "data" { \n <data_definition> {<comment>} }
+<section_code> ::= "." "code" { \n <instruction> {<comment>} }
 
 <instruction> ::= "jmp" <label>
                | "jz" <label>
@@ -36,10 +36,10 @@
 
 <address> ::= $<identifier>
 
-<register> ::= "r" <number>
+<register> ::= "r"<number>
 
 <operand> ::= <register>
-            | "#" <number>
+            | "#"<number>
 
 <label> ::= <identifier>
 
