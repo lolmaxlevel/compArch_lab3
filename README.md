@@ -25,8 +25,8 @@
                | "mod" <register> <register> <register>
                | "load" <register> <address>
                | "store" <register> <address>
-               | "in" <register>
-               | "out" <register>
+               | "in" <port>
+               | "out" <port>
                | "inc" <register>
                | <label> ":"
 
@@ -37,6 +37,8 @@
 <address> ::= $<identifier>
 
 <register> ::= "r"<number>
+
+<port> ::= <number>
 
 <operand> ::= <register>
             | "#"<number>
