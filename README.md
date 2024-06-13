@@ -74,8 +74,8 @@
 - `inc a` - увеличение регистра `a` на 1.
 - `cmp a, b` - выставление флагов по результату операции `a - b`.
 - `halt` - остановка процессора.
-- `in a` - запись значения в регистр `a` из порта 1.
-- `out a` - вывод значения из памяти по регистру `a` в порт 1.
+- `in a` - запись значения в регистр `r8` из порта `a`.
+- `out a` - вывод значения из памяти по регистру `r8` в порт `a` .
 - `outn a` - вывод значения из регистра `a` (число которое лежит в регистре).
 - `jz a` - переход на адрес `a`, если флаг `z` положительный.
 - `jnz a` - переход на адрес `a`, если флаг `z` отрицательный.
@@ -283,8 +283,8 @@
 Для Менеджера портов реализован отдельный класс `PortManager`, для упрощения работы.
 С данными сигналами:
 
-- `signal_input` - прочитать значение из порта 0, при этом происходит конвертирование символа в число.
-- `signal_output` - записать значение в порт 0, при этом происходит конвертирование числа в символ, либо прямой вывод
+- `signal_input` - прочитать значение из порта, при этом происходит конвертирование символа в число.
+- `signal_output` - записать значение в порт, при этом происходит конвертирование числа в символ, либо прямой вывод
   числа.
 
 И главный класс `DataPath` реализует сигналы:
@@ -416,10 +416,10 @@ cat .\examples\cat.zxc
     move r0 #0 ; next symbol
     move r1 #9786 ; end char
     loop:
-        in r2
-        cmp r2 r1
+        in 0
+        cmp r8 r1
         jz end
-        out r2
+        out 0
         jmp loop
     end:
         halt
@@ -459,7 +459,7 @@ cat output.cxz
         "index": 2,
         "opcode": "in",
         "args": [
-            2
+            "0"
         ],
         "term": [
             3,
@@ -471,7 +471,7 @@ cat output.cxz
         "index": 3,
         "opcode": "cmp",
         "args": [
-            2,
+            8,
             1
         ],
         "term": [
@@ -497,7 +497,7 @@ cat output.cxz
         "index": 5,
         "opcode": "out",
         "args": [
-            2
+            "0"
         ],
         "term": [
             6,
@@ -530,59 +530,59 @@ cat output.cxz
     }
 ]
 python .\machine.py .\output.cxz .\examples\input.txt
-DEBUG:root:Tick:   2 PC:   0 R0:   0 R1:   0 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False move [0, 0, 'direct']
-DEBUG:root:Tick:   4 PC:   1 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False move [1, 9786, 'direct']
-DEBUG:root:input: 'i'
-DEBUG:root:Tick:   6 PC:   2 R0:   0 R1: 9786 R2: 105 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
-DEBUG:root:Tick:   9 PC:   3 R0:   0 R1: 9786 R2: 105 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False cmp [2, 1]
-DEBUG:root:Tick:  11 PC:   4 R0:   0 R1: 9786 R2: 105 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jz ['absolute', 7]
-DEBUG:root:output: '' << 'i'
-DEBUG:root:Tick:  13 PC:   5 R0:   0 R1: 9786 R2: 105 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False out [2]
-DEBUG:root:Tick:  15 PC:   1 R0:   0 R1: 9786 R2: 105 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jmp ['absolute', 2]
-DEBUG:root:input: 'l'
-DEBUG:root:Tick:  17 PC:   2 R0:   0 R1: 9786 R2: 108 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
-DEBUG:root:Tick:  20 PC:   3 R0:   0 R1: 9786 R2: 108 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False cmp [2, 1]
-DEBUG:root:Tick:  22 PC:   4 R0:   0 R1: 9786 R2: 108 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jz ['absolute', 7]
-DEBUG:root:output: 'i' << 'l'
-DEBUG:root:Tick:  24 PC:   5 R0:   0 R1: 9786 R2: 108 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False out [2]
-DEBUG:root:Tick:  26 PC:   1 R0:   0 R1: 9786 R2: 108 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jmp ['absolute', 2]
-DEBUG:root:input: 'u'
-DEBUG:root:Tick:  28 PC:   2 R0:   0 R1: 9786 R2: 117 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
-DEBUG:root:Tick:  31 PC:   3 R0:   0 R1: 9786 R2: 117 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False cmp [2, 1]
-DEBUG:root:Tick:  33 PC:   4 R0:   0 R1: 9786 R2: 117 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jz ['absolute', 7]
-DEBUG:root:output: 'il' << 'u'
-DEBUG:root:Tick:  35 PC:   5 R0:   0 R1: 9786 R2: 117 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False out [2]
-DEBUG:root:Tick:  37 PC:   1 R0:   0 R1: 9786 R2: 117 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jmp ['absolute', 2]
-DEBUG:root:input: 's'
-DEBUG:root:Tick:  39 PC:   2 R0:   0 R1: 9786 R2: 115 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
-DEBUG:root:Tick:  42 PC:   3 R0:   0 R1: 9786 R2: 115 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False cmp [2, 1]
-DEBUG:root:Tick:  44 PC:   4 R0:   0 R1: 9786 R2: 115 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jz ['absolute', 7]
-DEBUG:root:output: 'ilu' << 's'
-DEBUG:root:Tick:  46 PC:   5 R0:   0 R1: 9786 R2: 115 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False out [2]
-DEBUG:root:Tick:  48 PC:   1 R0:   0 R1: 9786 R2: 115 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jmp ['absolute', 2]
-DEBUG:root:input: 'h'
-DEBUG:root:Tick:  50 PC:   2 R0:   0 R1: 9786 R2: 104 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
-DEBUG:root:Tick:  53 PC:   3 R0:   0 R1: 9786 R2: 104 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False cmp [2, 1]
-DEBUG:root:Tick:  55 PC:   4 R0:   0 R1: 9786 R2: 104 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jz ['absolute', 7]
-DEBUG:root:output: 'ilus' << 'h'
-DEBUG:root:Tick:  57 PC:   5 R0:   0 R1: 9786 R2: 104 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False out [2]
-DEBUG:root:Tick:  59 PC:   1 R0:   0 R1: 9786 R2: 104 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jmp ['absolute', 2]
-DEBUG:root:input: 'a'
-DEBUG:root:Tick:  61 PC:   2 R0:   0 R1: 9786 R2:  97 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
-DEBUG:root:Tick:  64 PC:   3 R0:   0 R1: 9786 R2:  97 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False cmp [2, 1]
-DEBUG:root:Tick:  66 PC:   4 R0:   0 R1: 9786 R2:  97 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jz ['absolute', 7]
-DEBUG:root:output: 'ilush' << 'a'
-DEBUG:root:Tick:  68 PC:   5 R0:   0 R1: 9786 R2:  97 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False out [2]
-DEBUG:root:Tick:  70 PC:   1 R0:   0 R1: 9786 R2:  97 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False jmp ['absolute', 2]
-DEBUG:root:input: '☺'
-DEBUG:root:Tick:  72 PC:   2 R0:   0 R1: 9786 R2: 9786 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False in [2]
-DEBUG:root:Tick:  75 PC:   3 R0:   0 R1: 9786 R2: 9786 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: True cmp [2, 1]
-DEBUG:root:Tick:  77 PC:   6 R0:   0 R1: 9786 R2: 9786 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: True jz ['absolute', 7]
+DEBUG:root:Tick:   2 PC:   1 R0:   0 R1:   0 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False move [0, 0, 'direct']
+DEBUG:root:Tick:   4 PC:   2 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:   0 Zero: False move [1, 9786, 'direct']
+DEBUG:root:input: 'i', from port 0
+DEBUG:root:Tick:   6 PC:   3 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 105 Zero: False in ['0']
+DEBUG:root:Tick:   9 PC:   4 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 105 Zero: False cmp [8, 1]
+DEBUG:root:Tick:  11 PC:   5 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 105 Zero: False jz ['absolute', 7]
+DEBUG:root:output: '' << 'i', to port 0
+DEBUG:root:Tick:  13 PC:   6 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 105 Zero: False out ['0']
+DEBUG:root:Tick:  15 PC:   2 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 105 Zero: False jmp ['absolute', 2]
+DEBUG:root:input: 'l', from port 0
+DEBUG:root:Tick:  17 PC:   3 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 108 Zero: False in ['0']
+DEBUG:root:Tick:  20 PC:   4 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 108 Zero: False cmp [8, 1]
+DEBUG:root:Tick:  22 PC:   5 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 108 Zero: False jz ['absolute', 7]
+DEBUG:root:output: 'i' << 'l', to port 0
+DEBUG:root:Tick:  24 PC:   6 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 108 Zero: False out ['0']
+DEBUG:root:Tick:  26 PC:   2 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 108 Zero: False jmp ['absolute', 2]
+DEBUG:root:input: 'u', from port 0
+DEBUG:root:Tick:  28 PC:   3 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 117 Zero: False in ['0']
+DEBUG:root:Tick:  31 PC:   4 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 117 Zero: False cmp [8, 1]
+DEBUG:root:Tick:  33 PC:   5 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 117 Zero: False jz ['absolute', 7]
+DEBUG:root:output: 'il' << 'u', to port 0
+DEBUG:root:Tick:  35 PC:   6 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 117 Zero: False out ['0']
+DEBUG:root:Tick:  37 PC:   2 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 117 Zero: False jmp ['absolute', 2]
+DEBUG:root:input: 's', from port 0
+DEBUG:root:Tick:  39 PC:   3 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 115 Zero: False in ['0']
+DEBUG:root:Tick:  42 PC:   4 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 115 Zero: False cmp [8, 1]
+DEBUG:root:Tick:  44 PC:   5 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 115 Zero: False jz ['absolute', 7]
+DEBUG:root:output: 'ilu' << 's', to port 0
+DEBUG:root:Tick:  46 PC:   6 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 115 Zero: False out ['0']
+DEBUG:root:Tick:  48 PC:   2 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 115 Zero: False jmp ['absolute', 2]
+DEBUG:root:input: 'h', from port 0
+DEBUG:root:Tick:  50 PC:   3 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 104 Zero: False in ['0']
+DEBUG:root:Tick:  53 PC:   4 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 104 Zero: False cmp [8, 1]
+DEBUG:root:Tick:  55 PC:   5 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 104 Zero: False jz ['absolute', 7]
+DEBUG:root:output: 'ilus' << 'h', to port 0
+DEBUG:root:Tick:  57 PC:   6 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 104 Zero: False out ['0']
+DEBUG:root:Tick:  59 PC:   2 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 104 Zero: False jmp ['absolute', 2]
+DEBUG:root:input: 'a', from port 0
+DEBUG:root:Tick:  61 PC:   3 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:  97 Zero: False in ['0']
+DEBUG:root:Tick:  64 PC:   4 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:  97 Zero: False cmp [8, 1]
+DEBUG:root:Tick:  66 PC:   5 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:  97 Zero: False jz ['absolute', 7]
+DEBUG:root:output: 'ilush' << 'a', to port 0
+DEBUG:root:Tick:  68 PC:   6 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:  97 Zero: False out ['0']
+DEBUG:root:Tick:  70 PC:   2 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8:  97 Zero: False jmp ['absolute', 2]
+DEBUG:root:input: '☺', from port 0
+DEBUG:root:Tick:  72 PC:   3 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 9786 Zero: False in ['0']
+DEBUG:root:Tick:  75 PC:   4 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 9786 Zero: True cmp [8, 1]
+DEBUG:root:Tick:  77 PC:   7 R0:   0 R1: 9786 R2:   0 R3:   0 R4:   0 R5:   0 R6:   0 R7:   0 R8: 9786 Zero: True jz ['absolute', 7]
 WARNING:root:HALT
 ilusha
-instr_counter:  7 ticks: 78
+instr_counter:  35 ticks: 78
 DEBUG:root:output buffer: ilusha
-DEBUG:root:instr_counter: 7 ticks: 78
+DEBUG:root:instr_counter: 35 ticks: 78
 ```
 
 Пример проверки исходного кода:
